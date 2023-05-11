@@ -1,16 +1,26 @@
 = Horizontal Pod Autoscaler Configuration
 
-This lab focuses on the configuration of Horizontal Pod Autoscaling for OpenLibertyApplication instances.
+This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLibertyApplication instances.
 
-== Horizontal Pod Autoscaling
-`HorizontalPodAutoscaler` automatically scales a workload resource to based on the configured demand, such as CPU and memory consumption. Horizontal scaling involves adjusting the number of Pods to handle the load. For example, if the load decreases and the number of running Pods is above the minimum configuration, the number of Pods will scale down. The same principle applies in the opposite scenario.
+== Horizontal Pod Autoscaler (HPA)
+`Horizontal Pod Autoscaler (HPA)` is a feature that automates the scaling of workloads such as Deployments or StatefulSets, based on the configured demand for their resources, typically measured by CPU and memory consumption. It dynamically adjusts the number of Pods to efficiently handle the workload's resource requirements. When the workload is under-utilized and the number of running Pods is above the minimum configured value, HPA reduces the number of Pods. Conversely, when the workload is over-utilized and the number of running Pods is below the maximum configured value, HPA increases the number of Pods. By automatically scaling the number of Pods based on demand, HPA enables efficient resource utilization and eliminates the need for manual intervention in scaling decision.
 
-==== Configuration Options
+== Configuration Options
 There are two methods to deploy OpenLibertyApplication instance on your cluster.
 
-=== Option A: Through `oc` client
+.*Method A: Deployment through `oc` client*
+[%collapsible]
+====
+1. To set your current namespace to be the namespace you will be working in, run the following commands:
++
+> *_Note:_* _Replace `<your-namespace>` with the namespace provided to you for the lab._
++
+[source,sh]
+----
+export NAMESPACE=<your-namespace>
+oc project $NAMESPACE
+----
 
-1. Set your current namespace using the command: `oc project $NAMESPACE`
 
 2. Create a YAML file called `liberty-autoscaling.yaml` with the following content
 +
@@ -45,13 +55,57 @@ spec:
       failureThreshold: 12
 ----
 
-3. Create the OpenLibertyApplication instance using the command: `oc apply -f liberty-autoscaling.yaml`. This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
+3. Create the OpenLibertyApplication instance using the command:
++
+[source,sh]
+----
+oc apply -f liberty-autoscaling.yaml
+----
+This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
 
-4. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: `oc edit OpenLibertyApplication autoscaling-liberty-app`. Remove `replicas: 1` under `spec` and replace it with the following:
+4. Check the status of the OpenLibertyApplication instance by running:
++
+[source,sh]
+----
+oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+----
+It will print output similar to the following:
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "message": "Deployment replicas ready: 1/1",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+----
+As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+
+5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
++
+[source,sh]
+----
+oc edit OpenLibertyApplication autoscaling-liberty-app
+----
+Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
 [source,yaml]
 ----
-spec:
   resources:
     requests:
       cpu: "0.4"
@@ -60,6 +114,44 @@ spec:
     minReplicas: 3
     targetCPUUtilizationPercentage: 50
 ----
-`resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
+The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
 
-=== Option B: Through OpenShift Web Console
+6. Check the status of the OpenLibertyApplication instance again by running:
++
+[source,sh]
+----
+oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+----
+It will print output similar to the following:
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:45:16Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:45:16Z",
+    "message": "Deployment replicas ready: 3",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+----
+Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+
+====
+
+.*Method B: Deployment through OpenShift Web Console*
+[%collapsible]
+====
+====
