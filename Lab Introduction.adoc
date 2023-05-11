@@ -1,0 +1,14 @@
+# Open Liberty Operator Labs
+
+In this Lab, you will install Open Liberty Operator on Red Hat® OpenShift® Container Platform and explore advanced features of the operator.
+
+Each lab will help you familiarize with advanced features of Open Liberty Operator. Features you will explore:
+- Horizontal Pod Autoscaling with CPU and Memory resource constraints
+- Knative services
+- Semeru Cloud Compiler (JIT Server integration)
+- Certificate management and TLS
+
+Pre-requisites
+
+1. Have access to OpenShift cluster with Open Liberty Operator installed
+2. Ensure you have `oc` client installed
