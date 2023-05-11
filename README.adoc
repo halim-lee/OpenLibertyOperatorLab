@@ -14,3 +14,12 @@ Before starting the lab, please ensure you meet the following requirements:
 
 1. Access to an OpenShift cluster with Open Liberty Operator already installed.
 2. The `oc` client installed on your system.
+
+## Kubernetes Basics
+If you are new to containers and Kubernetes, see below to learn the basics.
+
+### Containers and Docker
+Review the link:++https://www.ibm.com/cloud/architecture/content/course/containers-and-docker++[one hour course for an introduction to containers and docker].
+
+### Kubernetes Fundamentals
+Review the link:++https://www.ibm.com/cloud/architecture/content/course/kubernetes-101++[one hour course for an introduction to Kubernetes].
