@@ -1,30 +1,65 @@
-= Integration with Knative Lab
+= Horizontal Pod Autoscaler Configuration
 
-Welcome to the Open Liberty Operator Labs. This series of labs is designed to help you explore and learn about the advanced features of Open Liberty Operator on Red Hat® OpenShift® Container Platform.
+This lab focuses on the configuration of Horizontal Pod Autoscaling for OpenLibertyApplication instances.
 
-During the lab sessions, you will have the opportunity to explore the following features:
+== Horizontal Pod Autoscaling
+`HorizontalPodAutoscaler` automatically scales a workload resource to based on the configured demand, such as CPU and memory consumption. Horizontal scaling involves adjusting the number of Pods to handle the load. For example, if the load decreases and the number of running Pods is above the minimum configuration, the number of Pods will scale down. The same principle applies in the opposite scenario.
 
-* Horizontal Pod Autoscaling with CPU and Memory resource constraints
-* Knative services
-* Semeru Cloud Compiler (JIT Server integration)
-* Certificate management and TLS
+==== Configuration Options
+There are two methods to deploy OpenLibertyApplication instance on your cluster.
 
-== Open Liberty Operator
-If you are interested in gaining in-depth knowledge about Open Liberty Operator, refer to the link:++https://github.com/OpenLiberty/open-liberty-operator/blob/main/doc/user-guide-v1.adoc++[documentation].
+=== Option A: Through `oc` client
 
-== Lab Prerequisites
-Before starting the lab, please ensure you meet the following requirements:
+1. Set your current namespace using the command: `oc project $NAMESPACE`
 
-1. Access to an OpenShift cluster with Open Liberty Operator already installed.
-** If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
-2. The `oc` client installed on your system.
-** If you do not have it installed, you can download the client through the link:++https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/++[link].  
+2. Create a YAML file called `liberty-autoscaling.yaml` with the following content
++
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: autoscaling-liberty-app
+spec:
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 1
+  expose: false
+  probes:
+    readiness:
+      httpGet:
+        path: /
+        port: 9080
+      initialDelaySeconds: 1
+      timeoutSeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      failureThreshold: 24
+    liveness:
+      httpGet:
+        path: /
+        port: 9080
+      initialDelaySeconds: 8
+      timeoutSeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      failureThreshold: 12
+----
 
-== Kubernetes Basics
-If you are new to containers and Kubernetes, see below to learn the basics.
+3. Create the OpenLibertyApplication instance using the command: `oc apply -f liberty-autoscaling.yaml`. This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
 
-=== Containers and Docker
-Review the link:++https://www.ibm.com/cloud/architecture/content/course/containers-and-docker++[one hour course for an introduction to containers and docker].
+4. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: `oc edit OpenLibertyApplication autoscaling-liberty-app`. Remove `replicas: 1` under `spec` and replace it with the following:
++
+[source,yaml]
+----
+spec:
+  resources:
+    requests:
+      cpu: "0.4"
+  autoscaling:
+    maxReplicas: 5
+    minReplicas: 3
+    targetCPUUtilizationPercentage: 50
+----
+`resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
 
-=== Kubernetes Fundamentals
-Review the link:++https://www.ibm.com/cloud/architecture/content/course/kubernetes-101++[one hour course for an introduction to Kubernetes].
+=== Option B: Through OpenShift Web Console
