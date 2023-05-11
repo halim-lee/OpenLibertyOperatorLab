@@ -1,4 +1,4 @@
-= Open Liberty Operator Labs
+= Cert Manager
 
 Welcome to the Open Liberty Operator Labs. This series of labs is designed to help you explore and learn about the advanced features of Open Liberty Operator on Red Hat® OpenShift® Container Platform.
 
