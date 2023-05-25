@@ -3,10 +3,6 @@ ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]
 
-ifdef::env-github[]
-:imagesdir: images/
-endif::[]
-
 = Horizontal Pod Autoscaler Configuration
 
 This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLibertyApplication instances.
@@ -166,18 +162,35 @@ Compared to the last status output, `status` field now outputs the number of run
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assgined with for the lab.
-image::perspective.png[]
++
+image:images/perspective.png[,300]
 
 3. Click `+Add`. Under `Developer Catalog`, click `Operator Backed`. This page shows the operator catalog on the cluster and enables you to deploy operator managed services.
++
+image:images/operator-backed.png[,500]
 
 4. Click OpenLibertyApplication and create an instance.
++
+image:images/create-instance.png[,800]
 
 5. Change the OpenLibertyApplication instance to `autoscaling-liberty-app` under *Name* field. Set replicas to 1.
++
+image:images/replicas.png[,500]
 
 6. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
++
+image:images/topology.png[,900]
 
 7. If you would like to see the instance's status at once, click link at `Managed by CSV`. This will direct you to Open Liberty Operator's details.
++
+image:images/csv.png[,400]
 
-8. Click `OpenLibertyApplication` tab and select `autoscaling-liberty-app` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
+8. Click `OpenLibertyApplication` tab and select `autoscaling-liberty-app` instance.
++
+image:images/operator-details.png[,900]
++
+At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
++
+image:images/status-conditions.png[,900]
 
 ====
