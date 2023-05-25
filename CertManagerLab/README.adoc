@@ -69,7 +69,7 @@ spec:
 ----
 oc apply -f liberty-certificate.yaml
 ----
-This will create a Deployment named `certificate-liberty-app` with 1 replica. By setting `manageTLS` field to true, the operator attempts to generate certificates and mount them to the pod at `/etc/x509/certs`. Port `9443` is used as the default service port. Since `expose` field is set to true, the Route is also configured automatically to enable TLS by using `reencrypt` termination.
+This will create a Deployment named `certificate-liberty-app` with 1 replica. By setting `.spec.manageTLS` field to true, the operator attempts to generate certificates and mount them to the pod at `/etc/x509/certs`. Port `9443` is used as the default service port. Since `.spec.expose` field is set to true, the Route is also configured automatically to enable TLS by using `reencrypt` termination.
 
 4. Check the status of the OpenLibertyApplication instance by running:
 +
@@ -104,7 +104,7 @@ It will print output similar to the following:
 ----
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Verify that a certificate authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
+5. Verify that a Certificate Authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
 +
 [source,sh]
 ----
@@ -112,58 +112,80 @@ oc get secrets -n $NAMESPACE
 oc get issuers -n $NAMESPACE -o wide
 ----
 
-6. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
+6. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
 +
 [source,sh]
 ----
 oc edit OpenLibertyApplication certificate-liberty-app
 ----
-Then remove `replicas: 1` under `spec` field and replace it with the following:
+Then add `service` field under `spec` field as the following:
 +
 [source,yaml]
 ----
-  resources:
-    requests:
-      cpu: "0.4"
-  autoscaling:
-    maxReplicas: 5
-    minReplicas: 3
-    targetCPUUtilizationPercentage: 50
+  service:
+    annotations:
+      service.beta.openshift.io/serving-cert-secret-name: my-app-svc-tls-ocp
+    port: 9443
 ----
-The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
+This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file.
 
-7. Check the status of the OpenLibertyApplication instance again by running:
+7. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
++
+[source,yaml]
+----
+apiVersion: v1
+kind: Secret
+metadata:
+  name: olo-custom-ca-tls
+data:
+  tls.crt: >-
+    LS0tLS.....
+  tls.key: >-
+    LS0tL.....
+type: kubernetes.io/tls
+----
+Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues certifiactes for the service by using the provided CA.
+
+8. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create a YAML file called `cert-issuer.yaml` with the following content:
++
+[source,yaml]
+----
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: olo-custom-issuer
+spec:
+  vault:
+    auth:
+      tokenSecretRef:
+        key: token
+        name: vault-token
+    path: pki/sign/cert-manager
+    server: >-
+      https://vault-internal.vault.svc:8201
+----
+Note that the issuer's name is `olo-custom-issuer`. This way, the operator knows that a custom issuer exists.
+
+9. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
++
+[source,sh]
+----
+oc edit OpenLibertyApplication certificate-liberty-app
+----
+Then change `manageTLS: true` under `spec` field to `manageTLS: false`:
++
+[source,yaml]
+----
+  manageTLS: false
+----
+The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
+
+10. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
 oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions'
 ----
-It will print output similar to the following:
-+
-[source,log]
-----
-[
-  {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
-    "status": "True",
-    "type": "Reconciled"
-  },
-  {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Application is reconciled and resources are ready.",
-    "status": "True",
-    "type": "Ready"
-  },
-  {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Deployment replicas ready: 3",
-    "reason": "MinimumReplicasAvailable",
-    "status": "True",
-    "type": "ResourcesReady"
-  }
-]
-----
-Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
 ====
 
