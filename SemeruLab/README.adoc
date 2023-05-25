@@ -1,30 +1,196 @@
-= Integration with Semeru Cloud Compiler Lab
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+endif::[]
 
-Welcome to the Open Liberty Operator Labs. This series of labs is designed to help you explore and learn about the advanced features of Open Liberty Operator on Red Hat® OpenShift® Container Platform.
+= Horizontal Pod Autoscaler Configuration
 
-During the lab sessions, you will have the opportunity to explore the following features:
+This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLibertyApplication instances.
 
-* Horizontal Pod Autoscaling with CPU and Memory resource constraints
-* Knative services
-* Semeru Cloud Compiler (JIT Server integration)
-* Certificate management and TLS
+== Horizontal Pod Autoscaler (HPA)
+`Horizontal Pod Autoscaler (HPA)` is a feature that automates the scaling of workloads such as Deployments or StatefulSets, based on the configured demand for their resources, typically measured by CPU and memory consumption. It dynamically adjusts the number of Pods to efficiently handle the workload's resource requirements. When the workload is under-utilized and the number of running Pods is above the minimum configured value, HPA reduces the number of Pods. Conversely, when the workload is over-utilized and the number of running Pods is below the maximum configured value, HPA increases the number of Pods. By automatically scaling the number of Pods based on demand, HPA enables efficient resource utilization and eliminates the need for manual intervention in scaling decision.
 
-== Open Liberty Operator
-If you are interested in gaining in-depth knowledge about Open Liberty Operator, refer to the link:++https://github.com/OpenLiberty/open-liberty-operator/blob/main/doc/user-guide-v1.adoc++[documentation].
+== Configuration Options
+Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
-== Lab Prerequisites
-Before starting the lab, please ensure you meet the following requirements:
+.*Method A: Deployment through `oc` client*
+[%collapsible]
+====
+1. To set your current namespace to be the namespace you will be working in, run the following commands:
++
+NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
++
+[source,sh]
+----
+export NAMESPACE=<your-namespace>
+oc project $NAMESPACE
+----
 
-1. Access to an OpenShift cluster with Open Liberty Operator already installed.
-** If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
-2. The `oc` client installed on your system.
-** If you do not have it installed, you can download the client through the link:++https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/++[link].  
 
-== Kubernetes Basics
-If you are new to containers and Kubernetes, see below to learn the basics.
+2. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
++
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: autoscaling-liberty-app
+spec:
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 1
+  expose: false
+  probes:
+    readiness:
+      httpGet:
+        path: /
+        port: 9080
+      initialDelaySeconds: 1
+      timeoutSeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      failureThreshold: 24
+    liveness:
+      httpGet:
+        path: /
+        port: 9080
+      initialDelaySeconds: 8
+      timeoutSeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      failureThreshold: 12
+----
 
-=== Containers and Docker
-Review the link:++https://www.ibm.com/cloud/architecture/content/course/containers-and-docker++[one hour course for an introduction to containers and docker].
+3. Create the OpenLibertyApplication instance using the command:
++
+[source,sh]
+----
+oc apply -f liberty-autoscaling.yaml
+----
+This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
 
-=== Kubernetes Fundamentals
-Review the link:++https://www.ibm.com/cloud/architecture/content/course/kubernetes-101++[one hour course for an introduction to Kubernetes].
+4. Check the status of the OpenLibertyApplication instance by running:
++
+[source,sh]
+----
+oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+----
+It will print output similar to the following:
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "message": "Deployment replicas ready: 1/1",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+----
+As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+
+5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
++
+[source,sh]
+----
+oc edit OpenLibertyApplication autoscaling-liberty-app
+----
+Then remove `replicas: 1` under `spec` field and replace it with the following:
++
+[source,yaml]
+----
+  resources:
+    requests:
+      cpu: "0.4"
+  autoscaling:
+    maxReplicas: 5
+    minReplicas: 3
+    targetCPUUtilizationPercentage: 50
+----
+The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
+
+6. Check the status of the OpenLibertyApplication instance again by running:
++
+[source,sh]
+----
+oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+----
+It will print output similar to the following:
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:45:16Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-05-11T18:45:16Z",
+    "message": "Deployment replicas ready: 3",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+----
+Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+
+====
+
+.*Method B: Deployment through OpenShift Web Console*
+[%collapsible]
+====
+1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
+
+2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assgined with for the lab.
++
+image:images/perspective.png[,300]
+
+3. Click `+Add`. Under `Developer Catalog`, click `Operator Backed`. This page shows the operator catalog on the cluster and enables you to deploy operator managed services.
++
+image:images/operator-backed.png[,500]
+
+4. Click OpenLibertyApplication and create an instance.
++
+image:images/create-instance.png[,800]
+
+5. Change the OpenLibertyApplication instance to `autoscaling-liberty-app` under *Name* field. Set replicas to 1.
++
+image:images/replicas.png[,500]
+
+6. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
++
+image:images/topology.png[,900]
+
+7. If you would like to see the instance's status at once, click link at `Managed by CSV`. This will direct you to Open Liberty Operator's details.
++
+image:images/csv.png[,400]
+
+8. Click `OpenLibertyApplication` tab and select `autoscaling-liberty-app` instance.
++
+image:images/operator-details.png[,900]
++
+At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
++
+image:images/status-conditions.png[,900]
+
+====
