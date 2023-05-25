@@ -11,7 +11,7 @@ This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLiber
 `Horizontal Pod Autoscaler (HPA)` is a feature that automates the scaling of workloads such as Deployments or StatefulSets, based on the configured demand for their resources, typically measured by CPU and memory consumption. It dynamically adjusts the number of Pods to efficiently handle the workload's resource requirements. When the workload is under-utilized and the number of running Pods is above the minimum configured value, HPA reduces the number of Pods. Conversely, when the workload is over-utilized and the number of running Pods is below the maximum configured value, HPA increases the number of Pods. By automatically scaling the number of Pods based on demand, HPA enables efficient resource utilization and eliminates the need for manual intervention in scaling decision.
 
 == Configuration Options
-There are two methods to deploy OpenLibertyApplication instance on your cluster.
+Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
 [%collapsible]
