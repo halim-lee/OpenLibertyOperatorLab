@@ -3,12 +3,14 @@ ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]
 
-= Horizontal Pod Autoscaler Configuration
+= TLS Certificate Generation
 
-This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLibertyApplication instances.
+This lab focuses on the TLS certification generate and configuration, as well as an integration of Certificate Manager for OpenLibertyApplication instances.
 
-== Horizontal Pod Autoscaler (HPA)
-`Horizontal Pod Autoscaler (HPA)` is a feature that automates the scaling of workloads such as Deployments or StatefulSets, based on the configured demand for their resources, typically measured by CPU and memory consumption. It dynamically adjusts the number of Pods to efficiently handle the workload's resource requirements. When the workload is under-utilized and the number of running Pods is above the minimum configured value, HPA reduces the number of Pods. Conversely, when the workload is over-utilized and the number of running Pods is below the maximum configured value, HPA increases the number of Pods. By automatically scaling the number of Pods based on demand, HPA enables efficient resource utilization and eliminates the need for manual intervention in scaling decision.
+== TLS Certificates Configuration
+An administrator can configure TLS certificates to secure applications that run on Kubernetes-based clusters. By default, the operator generates certificates. Instead, an administrator can specify certificates for the Route and Service. `cert-manager` tool enables the operator to automatically provision TLS certificates for Pods and Routes. Certificates are mounted into containers from a Kubernetes secret so that the certificates are automatically refreshed when they update. For more information about the tool, see https://cert-manager.io/.
+
+There are three ways to generate and configure certificates with Open Liberty Operator, and the lab will walk you through each way. Before starting the lab, ensure that certificate manager is installed on the OpenShift cluster. If it is not already installed, please contact the Lab Administrators to have it installed.
 
 == Configuration Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
@@ -27,18 +29,19 @@ oc project $NAMESPACE
 ----
 
 
-2. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
+2. Create a YAML file called `liberty-certificate.yaml` with the following content:
 +
 [source,yaml]
 ----
 apiVersion: apps.openliberty.io/v1
 kind: OpenLibertyApplication
 metadata:
-  name: autoscaling-liberty-app
+  name: certificate-liberty-app
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
-  expose: false
+  expose: true
+  manageTLS: true
   probes:
     readiness:
       httpGet:
@@ -64,15 +67,15 @@ spec:
 +
 [source,sh]
 ----
-oc apply -f liberty-autoscaling.yaml
+oc apply -f liberty-certificate.yaml
 ----
-This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
+This will create a Deployment named `certificate-liberty-app` with 1 replica. By setting `manageTLS` field to true, the operator attempts to generate certificates and mount them to the pod at `/etc/x509/certs`. Port `9443` is used as the default service port. Since `expose` field is set to true, the Route is also configured automatically to enable TLS by using `reencrypt` termination.
 
 4. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions'
 ----
 It will print output similar to the following:
 +
@@ -101,11 +104,19 @@ It will print output similar to the following:
 ----
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
+5. Verify that a certificate authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
 +
 [source,sh]
 ----
-oc edit OpenLibertyApplication autoscaling-liberty-app
+oc get secrets -n $NAMESPACE
+oc get issuers -n $NAMESPACE -o wide
+----
+
+6. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
++
+[source,sh]
+----
+oc edit OpenLibertyApplication certificate-liberty-app
 ----
 Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
@@ -121,11 +132,11 @@ Then remove `replicas: 1` under `spec` field and replace it with the following:
 ----
 The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
 
-6. Check the status of the OpenLibertyApplication instance again by running:
+7. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions'
 ----
 It will print output similar to the following:
 +
@@ -173,7 +184,7 @@ image:images/operator-backed.png[,500]
 +
 image:images/create-instance.png[,800]
 
-5. Change the OpenLibertyApplication instance to `autoscaling-liberty-app` under *Name* field. Set replicas to 1.
+5. Change the OpenLibertyApplication instance to `certificate-liberty-app` under *Name* field. Set replicas to 1.
 +
 image:images/replicas.png[,500]
 
@@ -185,7 +196,7 @@ image:images/topology.png[,900]
 +
 image:images/csv.png[,400]
 
-8. Click `OpenLibertyApplication` tab and select `autoscaling-liberty-app` instance.
+8. Click `OpenLibertyApplication` tab and select `certificate-liberty-app` instance.
 +
 image:images/operator-details.png[,900]
 +
