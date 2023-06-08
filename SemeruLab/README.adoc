@@ -3,12 +3,12 @@ ifdef::env-github[]
 :note-caption: :information_source:
 endif::[]
 
-= Horizontal Pod Autoscaler Configuration
+= Semeru Cloud Compiler Integration
 
-This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLibertyApplication instances.
+This lab focuses on the configuration of Semeru Cloud Compiler for OpenLibertyApplication instances.
 
-== Horizontal Pod Autoscaler (HPA)
-`Horizontal Pod Autoscaler (HPA)` is a feature that automates the scaling of workloads such as Deployments or StatefulSets, based on the configured demand for their resources, typically measured by CPU and memory consumption. It dynamically adjusts the number of Pods to efficiently handle the workload's resource requirements. When the workload is under-utilized and the number of running Pods is above the minimum configured value, HPA reduces the number of Pods. Conversely, when the workload is over-utilized and the number of running Pods is below the maximum configured value, HPA increases the number of Pods. By automatically scaling the number of Pods based on demand, HPA enables efficient resource utilization and eliminates the need for manual intervention in scaling decision.
+== Semeru Cloud Compiler (JIT Server Ingeration)
+`Semeru Cloud Compiler` handles Just-In-Time (JIT) compilation requests from the applications and provides the process independently from the application virtual machine. This decoupling method optimizes the resources utilization, including CPU and memory utilization optimization in the application VM.
 
 == Configuration Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
@@ -27,52 +27,35 @@ oc project $NAMESPACE
 ----
 
 
-2. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
+2. Create a YAML file called `liberty-semeru.yaml` with the following content:
 +
 [source,yaml]
 ----
 apiVersion: apps.openliberty.io/v1
 kind: OpenLibertyApplication
 metadata:
-  name: autoscaling-liberty-app
+  name: liberty-app
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
   replicas: 1
-  expose: false
-  probes:
-    readiness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 1
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 24
-    liveness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 8
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 12
+  semeruCloudCompiler:
+    enable: true
+    replicas: 1
 ----
 
 3. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
-oc apply -f liberty-autoscaling.yaml
+oc apply -f liberty-semeru.yaml
 ----
-This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
+This will create a Deployment and Service named `liberty-app-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `liberty-app` for the application.
 
 4. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication liberty-app -ojson | jq '.status.conditions'
 ----
 It will print output similar to the following:
 +
@@ -101,58 +84,28 @@ It will print output similar to the following:
 ----
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
+6. Check semeru related properties in the status section as well.
 +
 [source,sh]
 ----
-oc edit OpenLibertyApplication autoscaling-liberty-app
-----
-Then remove `replicas: 1` under `spec` field and replace it with the following:
-+
-[source,yaml]
-----
-  resources:
-    requests:
-      cpu: "0.4"
-  autoscaling:
-    maxReplicas: 5
-    minReplicas: 3
-    targetCPUUtilizationPercentage: 50
-----
-The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
-
-6. Check the status of the OpenLibertyApplication instance again by running:
-+
-[source,sh]
-----
-oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication liberty-app -ojson | jq '.status.semeruCompiler, .status.references'
 ----
 It will print output similar to the following:
 +
 [source,log]
 ----
-[
-  {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
-    "status": "True",
-    "type": "Reconciled"
-  },
-  {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Application is reconciled and resources are ready.",
-    "status": "True",
-    "type": "Ready"
-  },
-  {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Deployment replicas ready: 3",
-    "reason": "MinimumReplicasAvailable",
-    "status": "True",
-    "type": "ResourcesReady"
-  }
-]
+{
+  "serviceHostname": "liberty-app-semeru-compiler-1.open-liberty-lab.svc",
+  "tlsSecretName": "liberty-app-semeru-compiler-1-tls-cm"
+}
+{
+  "saResourceVersion": "33776407",
+  "semeruGeneration": "1",
+  "semeruInstancesCompleted": "1",
+  "svcCertSecretName": "liberty-app-svc-tls-cm"
+}
 ----
-Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
 
 ====
 
