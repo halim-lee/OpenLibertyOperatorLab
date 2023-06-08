@@ -108,6 +108,7 @@ It will print output similar to the following:
 It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
 
 7. You can check what resources are managed by the operator through a command.
++
 [source,sh]
 ----
 kubectl get all -l app.kubernetes.io/part-of=liberty-app
