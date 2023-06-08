@@ -107,6 +107,30 @@ It will print output similar to the following:
 ----
 It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
 
+7. You can check what resources are managed by the operator through a command.
+[source,sh]
+----
+kubectl get all -l app.kubernetes.io/part-of=liberty-app
+----
+It will print output similar to the following:
++
+[source,log]
+----
+NAME                                                 READY   STATUS    RESTARTS   AGE
+pod/liberty-app-756fd76b8f-rwrw5                     1/1     Running   0          59m
+pod/liberty-app-semeru-compiler-1-77c8d48749-7r9rx   1/1     Running   0          59m
+
+NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+service/liberty-app                     ClusterIP   172.30.91.109    <none>        9443/TCP    59m
+service/liberty-app-semeru-compiler-1   ClusterIP   172.30.128.242   <none>        38400/TCP   59m
+
+NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/liberty-app                     1/1     1            1           59m
+deployment.apps/liberty-app-semeru-compiler-1   1/1     1            1           59m
+
+NAME                                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/liberty-app-756fd76b8f                     1         1         1       59m
+replicaset.apps/liberty-app-semeru-compiler-1-77c8d48749   1         1         1       59m
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
