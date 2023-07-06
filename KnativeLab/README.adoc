@@ -56,18 +56,18 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
   createKnativeService: true
-  expose: false
+  expose: true
 ----
 
-3. Create the OpenLibertyApplication instance using the command:
+4. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
 oc apply -f knative-enabled-sample.yaml
 ----
-The operator will create a Knative Service resource which manages the entire life cycle of a workload. Non-Knative resources, such as Service, Route and Deployment, will not be created.
+The operator will create a Knative Service resource which manages the entire life cycle of a workload.
 
-4. Check the status of the OpenLibertyApplication instance by running:
+5. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -79,20 +79,19 @@ It will print output similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "lastTransitionTime": "2023-07-06T15:24:28Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "lastTransitionTime": "2023-07-06T15:24:28Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:21:30Z",
-    "message": "Deployment replicas ready: 1/1",
-    "reason": "MinimumReplicasAvailable",
+    "lastTransitionTime": "2023-07-06T15:24:28Z",
+    "message": "Knative service is ready.",
     "status": "True",
     "type": "ResourcesReady"
   }
@@ -100,27 +99,46 @@ It will print output similar to the following:
 ----
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
+6. Check the managed resources and their statuses. Run the command: 
 +
 [source,sh]
 ----
-oc edit OpenLibertyApplication knative-enabled-sample
+oc get all -l app.kubernetes.io/part-of=knative-enabled-sample 
 ----
-Then remove `replicas: 1` under `spec` field and replace it with the following:
+Then the output will be similar to the following:
 +
-[source,yaml]
+[source,log]
 ----
-  resources:
-    requests:
-      cpu: "0.4"
-  autoscaling:
-    maxReplicas: 5
-    minReplicas: 3
-    targetCPUUtilizationPercentage: 50
-----
-The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
+NAME                                                          READY   STATUS    RESTARTS   AGE
+pod/knative-enabled-sample-00001-deployment-d8676b4c4-dl8m8   2/2     Running   0          20s
 
-6. Check the status of the OpenLibertyApplication instance again by running:
+NAME                                           TYPE           CLUSTER-IP      EXTERNAL-IP                                                  PORT(S)                                              AGE
+service/knative-enabled-sample                 ExternalName   <none>          kourier-internal.knative-serving-ingress.svc.cluster.local   80/TCP                                               4s
+service/knative-enabled-sample-00001           ClusterIP      172.30.138.3    <none>                                                       80/TCP,443/TCP                                       20s
+service/knative-enabled-sample-00001-private   ClusterIP      172.30.43.116   <none>                                                       80/TCP,443/TCP,9090/TCP,9091/TCP,8022/TCP,8012/TCP   20s
+
+NAME                                                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/knative-enabled-sample-00001-deployment   1/1     1            1           20s
+
+NAME                                                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/knative-enabled-sample-00001-deployment-d8676b4c4   1         1         1       20s
+
+NAME                                                        CONFIG NAME              K8S SERVICE NAME   GENERATION   READY   REASON   ACTUAL REPLICAS   DESIRED REPLICAS
+revision.serving.knative.dev/knative-enabled-sample-00001   knative-enabled-sample                      1            True             1                 1
+
+NAME                                               URL                                                                         READY   REASON
+route.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com   True    
+
+NAME                                                 URL                                                                         LATESTCREATED                  LATESTREADY                    READY   REASON
+service.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
+
+NAME                                                       LATESTCREATED                  LATESTREADY                    READY   REASON
+configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
+----
++
+It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. The number of running pods may change over time. This is an expected behaviour because Knative serving handles autoscaling of the deployment.
+
+7. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
