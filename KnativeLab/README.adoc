@@ -53,7 +53,7 @@ kind: OpenLibertyApplication
 metadata:
   name: knative-enabled-sample
 spec:
-  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
   createKnativeService: true
   expose: true
@@ -136,7 +136,7 @@ NAME                                                       LATESTCREATED        
 configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
 ----
 +
-It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers should be running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application.
+It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application. Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero.
 
 7. Check the status of the OpenLibertyApplication instance again by running:
 +
