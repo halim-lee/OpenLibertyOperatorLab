@@ -26,15 +26,32 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 
+2. Ensure `Red Hat OpenShift Serverless` operator is installed on the cluster and Knative Serving instance is Ready.
++
+[source,sh]
+----
+oc get subscription serverless-operator -n openshift-serverless
+oc get KnativeServing knative-serving -n knative-serving
+----
++
+You will get similar to the following if the operator is installed and the instance is Ready:
++
+[source,log]
+----
+NAME                  PACKAGE               SOURCE             CHANNEL
+serverless-operator   serverless-operator   redhat-operators   stable
+NAME              VERSION   READY   REASON
+knative-serving   1.8       True 
+----
 
-2. Create a YAML file called `knative-enabled-liberty.yaml` with the following content:
+3. Create a YAML file called `knative-enabled-sample.yaml` with the following content:
 +
 [source,yaml]
 ----
 apiVersion: apps.openliberty.io/v1
 kind: OpenLibertyApplication
 metadata:
-  name: knative-enabled-liberty
+  name: knative-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
@@ -65,7 +82,7 @@ spec:
 +
 [source,sh]
 ----
-oc apply -f knative-enabled-liberty.yaml
+oc apply -f knative-enabled-sample.yaml
 ----
 The operator will create a Knative Service resource which manages the entire life cycle of a workload. Non-Knative resources, such as Service, Route and Deployment, will not be created.
 
@@ -73,7 +90,7 @@ The operator will create a Knative Service resource which manages the entire lif
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication knative-enabled-liberty -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication knative-enabled-sample -ojson | jq '.status.conditions'
 ----
 It will print output similar to the following:
 +
@@ -106,7 +123,7 @@ As in the example output, `status` field shows the number of running replicas ou
 +
 [source,sh]
 ----
-oc edit OpenLibertyApplication knative-enabled-liberty
+oc edit OpenLibertyApplication knative-enabled-sample
 ----
 Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
@@ -126,7 +143,7 @@ The `resources` field defines a metrice source for targeted container resources.
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication knative-enabled-liberty -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication knative-enabled-sample -ojson | jq '.status.conditions'
 ----
 It will print output similar to the following:
 +
@@ -174,7 +191,7 @@ image:images/operator-backed.png[,500]
 +
 image:images/create-instance.png[,800]
 
-5. Change the OpenLibertyApplication instance to `knative-enabled-liberty` under *Name* field. Set replicas to 1.
+5. Change the OpenLibertyApplication instance to `knative-enabled-sample` under *Name* field. Set replicas to 1.
 +
 image:images/replicas.png[,500]
 
@@ -186,7 +203,7 @@ image:images/topology.png[,900]
 +
 image:images/csv.png[,400]
 
-8. Click `OpenLibertyApplication` tab and select `knative-enabled-liberty` instance.
+8. Click `OpenLibertyApplication` tab and select `knative-enabled-sample` instance.
 +
 image:images/operator-details.png[,900]
 +
