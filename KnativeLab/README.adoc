@@ -138,38 +138,7 @@ configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sampl
 +
 It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application. Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero.
 
-7. Check the status of the OpenLibertyApplication instance again by running:
-+
-[source,sh]
-----
-oc get OpenLibertyApplication knative-enabled-sample -ojson | jq '.status.conditions'
-----
-It will print output similar to the following:
-+
-[source,log]
-----
-[
-  {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
-    "status": "True",
-    "type": "Reconciled"
-  },
-  {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Application is reconciled and resources are ready.",
-    "status": "True",
-    "type": "Ready"
-  },
-  {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Deployment replicas ready: 3",
-    "reason": "MinimumReplicasAvailable",
-    "status": "True",
-    "type": "ResourcesReady"
-  }
-]
-----
-Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+7. Access the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`
 
 ====
 
