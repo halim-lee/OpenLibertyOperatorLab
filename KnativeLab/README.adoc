@@ -136,7 +136,7 @@ NAME                                                       LATESTCREATED        
 configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
 ----
 +
-It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. The number of running pods may change over time. This is an expected behaviour because Knative serving handles autoscaling of the deployment.
+It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers should be running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application.
 
 7. Check the status of the OpenLibertyApplication instance again by running:
 +
