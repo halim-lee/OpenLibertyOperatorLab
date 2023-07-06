@@ -8,7 +8,7 @@ endif::[]
 This lab focuses on the configuration of Semeru Cloud Compiler for OpenLibertyApplication instances.
 
 == Semeru Cloud Compiler (JIT Server Ingeration)
-`Semeru Cloud Compiler` handles Just-In-Time (JIT) compilation requests from the applications and provides the process independently from the application virtual machine. This decoupling method optimizes the resources utilization, including CPU and memory utilization optimization in the application VM.
+`Semeru Cloud Compiler` handles Just-In-Time (JIT) compilation requests from the applications and provides the process independently from the application virtual machine. This decoupling method optimizes the resources utilization, including CPU and memory utilization optimization in the application VM. The operator creates containerized Liberty applications and when enabled, creates deployment, service and certificate for Semeru Cloud Compiler and connect them to Liberty applications.
 
 == Configuration Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
@@ -34,10 +34,10 @@ oc project $NAMESPACE
 apiVersion: apps.openliberty.io/v1
 kind: OpenLibertyApplication
 metadata:
-  name: liberty-app
+  name: semeru-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
-  replicas: 1
+  replicas: 3
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -49,13 +49,13 @@ spec:
 ----
 oc apply -f liberty-semeru.yaml
 ----
-This will create a Deployment and Service named `liberty-app-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `liberty-app` for the application.
+This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
 
 4. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication semeru-enabled-sample -ojson | jq '.status.conditions'
 ----
 It will print output similar to the following:
 +
@@ -75,34 +75,34 @@ It will print output similar to the following:
   },
   {
     "lastTransitionTime": "2023-05-11T18:21:30Z",
-    "message": "Deployment replicas ready: 1/1",
+    "message": "Deployment replicas ready: 3/3",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
     "type": "ResourcesReady"
   }
 ]
 ----
-As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+As in the example output, `status` field shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
 
 6. Check semeru related properties in the status section as well.
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication liberty-app -ojson | jq '.status.semeruCompiler, .status.references'
+oc get OpenLibertyApplication semeru-enabled-sample -ojson | jq '.status.semeruCompiler, .status.references'
 ----
 It will print output similar to the following:
 +
 [source,log]
 ----
 {
-  "serviceHostname": "liberty-app-semeru-compiler-1.open-liberty-lab.svc",
-  "tlsSecretName": "liberty-app-semeru-compiler-1-tls-cm"
+  "serviceHostname": "semeru-enabled-sample-semeru-compiler-1.open-liberty-lab.svc",
+  "tlsSecretName": "semeru-enabled-sample-semeru-compiler-1-tls-cm"
 }
 {
   "saResourceVersion": "33776407",
   "semeruGeneration": "1",
   "semeruInstancesCompleted": "1",
-  "svcCertSecretName": "liberty-app-svc-tls-cm"
+  "svcCertSecretName": "semeru-enabled-sample-svc-tls-cm"
 }
 ----
 It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
@@ -111,27 +111,110 @@ It lists the service host name and associated TLS secret name under `.status.sem
 +
 [source,sh]
 ----
-kubectl get all -l app.kubernetes.io/part-of=liberty-app
+kubectl get all -l app.kubernetes.io/part-of=semeru-enabled-sample
 ----
 It will print output similar to the following:
 +
 [source,log]
 ----
 NAME                                                 READY   STATUS    RESTARTS   AGE
-pod/liberty-app-756fd76b8f-rwrw5                     1/1     Running   0          59m
-pod/liberty-app-semeru-compiler-1-77c8d48749-7r9rx   1/1     Running   0          59m
+pod/semeru-enabled-sample-756fd76b8f-rwrw5                     1/1     Running   0          59m
+pod/semeru-enabled-sample-semeru-compiler-1-77c8d48749-7r9rx   1/1     Running   0          59m
 
 NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
-service/liberty-app                     ClusterIP   172.30.91.109    <none>        9443/TCP    59m
-service/liberty-app-semeru-compiler-1   ClusterIP   172.30.128.242   <none>        38400/TCP   59m
+service/semeru-enabled-sample                  ClusterIP   172.30.91.109    <none>        9443/TCP    59m
+service/semeru-enabled-sample-semeru-compiler-1   ClusterIP   172.30.128.242   <none>        38400/TCP   59m
 
 NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/liberty-app                     1/1     1            1           59m
-deployment.apps/liberty-app-semeru-compiler-1   1/1     1            1           59m
+deployment.apps/semeru-enabled-sample                     1/1     1            1           59m
+deployment.apps/semeru-enabled-sample-semeru-compiler-1   1/1     1            1           59m
 
 NAME                                                       DESIRED   CURRENT   READY   AGE
-replicaset.apps/liberty-app-756fd76b8f                     1         1         1       59m
-replicaset.apps/liberty-app-semeru-compiler-1-77c8d48749   1         1         1       59m
+replicaset.apps/semeru-enabled-sample-756fd76b8f                     1         1         1       59m
+replicaset.apps/semeru-enabled-sample-semeru-compiler-1-77c8d48749   1         1         1       59m
+----
++
+The certificates are not reflected here, but you can check the certificates using `svcCertSecretName` and `tlsSecretName` in the status output above. These certificates are created and managed by the Cert Manager, which was covered before this lab. They are injected into the application as well as the JIT server via the secret by the operator.
+
+8. Check the logs of JIT server pods. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample-semeru-compiler-1`...
++
+[source,sh]
+----
+kubectl logs semeru-enabled-sample-semeru-compiler-1-77c8d48749-7r9rx
+----
++
+It will print output similar to the following:
++
+[source,log]
+----
+#INFO: StartTime: May 08 14:39:50 2023
+#INFO: TimeZone: UTC (UTC)
+
+JITServer is ready to accept incoming requests
+#JITServer: t= 21496 A new client (clientUID=123456643212345) connected. Server allocated a new client session.
+----
++
+You can see that there are clients connected to the JITServer with unique client ID for each application pod.
+
+9. Check the Liberty application log to ensure the connection with JIT Server. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample`...
++
+[source,sh]
+----
+kubectl logs semeru-enabled-sample-756fd76b8f-rwrw5
+----
++
+It will print output similar to the following:
++
+[source,log]
+----
+...
+#INFO: StartTime: May 08 14:39:50 2023
+#INFO: Free Physical Memory: 2403 MB
+#INFO: CPU entitlement = 800.00
+#JITServer: t= 10 Connected to a server (serverUID=18345234542131213)
+...
+----
++
+You can see that the Liberty application is successfully connected to JIT Server pod.
+
+10. To disable JIT Server integration, make changes to the OpenLibertyApplication instance.
++
+[source,sh]
+----
+kubectl edit OpenLibertyApplication/semeru-enabled-sample
+----
++
+Then change `.spec.semeruCloudCompiler.enable` to false
++
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: semeru-enabled-sample
+spec:
+  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
+  replicas: 3
+  semeruCloudCompiler:
+    enable: false
+----
++
+You will be able to see that the pods of JIT Server are now removed.
++
+[source,log]
+----
+NAME                                                 READY   STATUS    RESTARTS   AGE
+pod/semeru-enabled-sample-756fd76b8f-rwrw5                     1/1     Running   0          59m
+
+NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+service/semeru-enabled-sample                  ClusterIP   172.30.91.109    <none>        9443/TCP    59m
+
+NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/semeru-enabled-sample                     1/1     1            1           59m
+
+NAME                                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/semeru-enabled-sample-756fd76b8f                     1         1         1       59m
+----
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
@@ -151,7 +234,7 @@ image:images/operator-backed.png[,500]
 +
 image:images/create-instance.png[,800]
 
-5. Change the OpenLibertyApplication instance to `autoscaling-liberty-app` under *Name* field. Set replicas to 1.
+5. Change the OpenLibertyApplication instance to `semeru-enabled-sample` under *Name* field. Set replicas to 1.
 +
 image:images/replicas.png[,500]
 
@@ -163,7 +246,7 @@ image:images/topology.png[,900]
 +
 image:images/csv.png[,400]
 
-8. Click `OpenLibertyApplication` tab and select `autoscaling-liberty-app` instance.
+8. Click `OpenLibertyApplication` tab and select `semeru-enabled-sample` instance.
 +
 image:images/operator-details.png[,900]
 +
