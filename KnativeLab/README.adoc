@@ -158,6 +158,42 @@ Access the page, and you will be able to see the sample Liberty app page.
 +
 image:images/sample-app-page.png[,700]
 
+8. Edit OpenLibertyApplication to disable Knative configuration. Change `createKnativeService` field to false.
++
+[source,sh]
+----
+oc edit OpenLibertyApplication knative-enabled-sample
+----
++
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: knative-enabled-sample
+spec:
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 1
+  createKnativeService: false
+  expose: true
+  service:
+    port: 9080
+    type: ClusterIP
+----
+
+9. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
++
+[source,sh]
+----
+oc get all -l app.kubernetes.io/part-of=knative-enabled-sample 
+----
+Then the output will be similar to the following:
++
+[source,log]
+----
+
+----
+
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
