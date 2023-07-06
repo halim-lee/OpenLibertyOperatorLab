@@ -57,6 +57,9 @@ spec:
   replicas: 1
   createKnativeService: true
   expose: true
+  service:
+    port: 9080
+    type: ClusterIP
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
