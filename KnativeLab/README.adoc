@@ -38,6 +38,7 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
+  createKnativeService: true
   expose: false
   probes:
     readiness:
@@ -66,7 +67,7 @@ spec:
 ----
 oc apply -f knative-enabled-liberty.yaml
 ----
-This will create a Deployment named `knative-enabled-liberty` with 1 replica.
+The operator will create a Knative Service resource which manages the entire life cycle of a workload. Non-Knative resources, such as Service, Route and Deployment, will not be created.
 
 4. Check the status of the OpenLibertyApplication instance by running:
 +
