@@ -205,5 +205,13 @@ image:images/status-conditions.png[,900]
 +
 The `resources` field defines a metric source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
+9. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
++
+image:images/topology-new.png[,900]
++
+When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` condition type reporting `True`.
++
+image:images/hpa-status-conditions.png[,900]
+
 ====
 
