@@ -103,6 +103,7 @@ It will print output similar to the following:
   }
 ]
 ----
++
 As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
 6. Check the managed resources and their statuses. Run the command: 
@@ -252,8 +253,10 @@ image:images/ola.png[,900]
 7. Select `knative-enabled-sample` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
 +
 image:images/status-conditions.png[,900]
++
+As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-8. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
+8. Get the URL allocated by `Routes` resource. You can locate it in `Topology` section when you click on the application, with the name "knative-enabled-sample". For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
 +
 image:images/route.png[,900]
 +
