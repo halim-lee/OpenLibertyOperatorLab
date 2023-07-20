@@ -7,8 +7,8 @@ endif::[]
 
 This lab focuses on the configuration of Semeru Cloud Compiler for OpenLibertyApplication instances.
 
-== Semeru Cloud Compiler (JIT Server Ingeration)
-`Semeru Cloud Compiler` handles Just-In-Time (JIT) compilation requests from the applications and provides the process independently from the application virtual machine. This decoupling method optimizes the resources utilization, including CPU and memory utilization optimization in the application VM. The operator creates containerized Liberty applications and when enabled, creates deployment, service and certificate for Semeru Cloud Compiler and connect them to Liberty applications.
+== Semeru Cloud Compiler (JIT Server Integration)
+The `Semeru Cloud Compiler` efficiently manages Just-In-Time (JIT) compilation requests from applications, operating independently from the application's virtual machine. This decoupling approach leads to optimized resource utilization, including enhanced CPU and memory efficiency within the application VM. When the feature is enabled, Open Liberty Operator takes care of creating deployments, services, and certificates for the Semeru Cloud Comiler, seamlessly connecting them to the relevant applications.
 
 == Configuration Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
