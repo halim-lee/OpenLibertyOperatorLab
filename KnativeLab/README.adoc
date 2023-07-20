@@ -327,7 +327,6 @@ The operator will delete Knative related resources and create new resources for 
 +
 image:images/status-conditions-new.png[,900]
 +
-+
 Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1. When you check the managed resources in `Topology` section, you will no longer see Knative related resources.
 +
 image:images/topology-new.png[,900]
