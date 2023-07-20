@@ -249,10 +249,10 @@ Now the OpenLibertyApplication instance is reporting that the application is hos
 
 ====
 
+
 .*Method B: Deployment through OpenShift Web Console*
 [%collapsible]
 ====
-
 
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
 
