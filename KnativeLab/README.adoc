@@ -70,6 +70,7 @@ spec:
 ----
 oc apply -f knative-enabled-sample.yaml
 ----
++
 The operator will create a Knative Service resource which manages the entire life cycle of a workload.
 
 5. Check the status of the OpenLibertyApplication instance by running:
@@ -102,7 +103,7 @@ It will print output similar to the following:
   }
 ]
 ----
-As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
 6. Check the managed resources and their statuses. Run the command: 
 +
@@ -189,6 +190,7 @@ spec:
 ----
 oc get all -l app.kubernetes.io/part-of=knative-enabled-sample 
 ----
++
 Then the output will be similar to the following:
 +
 [source,log]
@@ -201,6 +203,8 @@ Then the output will be similar to the following:
 .*Method B: Deployment through OpenShift Web Console*
 [%collapsible]
 ====
+
+
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assgined with for the lab.
@@ -214,25 +218,56 @@ image:images/operator-backed.png[,500]
 4. Click OpenLibertyApplication and create an instance.
 +
 image:images/create-instance.png[,800]
-
-5. Change the OpenLibertyApplication instance to `knative-enabled-sample` under *Name* field. Set replicas to 1.
 +
-image:images/replicas.png[,500]
+Select YAML view and copy the following content:
++
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: knative-enabled-sample
+spec:
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 1
+  createKnativeService: true
+  expose: true
+  service:
+    port: 9080
+    type: ClusterIP
+----
++
+The operator will create a Knative Service resource which manages the entire life cycle of a workload.
 
-6. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
+5. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
 +
 image:images/topology.png[,900]
 
-7. If you would like to see the instance's status at once, click link at `Managed by CSV`. This will direct you to Open Liberty Operator's details.
+6. If you would like to see the instance's status at once, click `Search` tab on the left and search for `OpenLibertyApplications` resource.
 +
-image:images/csv.png[,400]
+image:images/ola.png[,900]
 
-8. Click `OpenLibertyApplication` tab and select `knative-enabled-sample` instance.
-+
-image:images/operator-details.png[,900]
-+
-At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
+7. Select `knative-enabled-sample` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
 +
 image:images/status-conditions.png[,900]
 
+8. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
++
+image:images/route.png[,900]
++
+Access the page, and you will be able to see the sample Liberty app page.
++
+image:images/sample-app-page.png[,700]
+
+9. Edit the OpenLibertyApplication instance to disable Knative configuration. Change `createKnativeService` field to false. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `knative-enabled-sample` instance again. Edit the OpenLibertyApplication instance as the following: 
++
+Change `createKnativeService: true` under `spec` field to `createKnativeService: false`:
++
+[source,yaml]
+----
+  createKnativeService: false
+----
+The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
+
+10. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created. Check the managed resources and the status of the OpenLibertyApplication instance again.
 ====
