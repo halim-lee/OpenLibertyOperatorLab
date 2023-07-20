@@ -196,7 +196,20 @@ Then the output will be similar to the following:
 +
 [source,log]
 ----
+NAME                                          READY   STATUS    RESTARTS   AGE
+pod/knative-enabled-sample-7b4cc69d49-6nwc4   1/1     Running   0          36s
 
+NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/knative-enabled-sample   ClusterIP   172.30.85.152   <none>        9080/TCP   36s
+
+NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/knative-enabled-sample   1/1     1            1           36s
+
+NAME                                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/knative-enabled-sample-7b4cc69d49   1         1         1       36s
+
+NAME                                              HOST/PORT                                                              PATH   SERVICES                 PORT       TERMINATION   WILDCARD
+route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-open-liberty-lab.apps.wsatest.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
 ----
 
 ====
@@ -272,7 +285,15 @@ Change `createKnativeService: true` under `spec` field to `createKnativeService:
 ----
   createKnativeService: false
 ----
-The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
++
+The operator will delete Knative related resources and create new resources for the application.
 
 10. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created. Check the managed resources and the status of the OpenLibertyApplication instance again.
++
+image:images/status-conditions-new.png[,900]
++
+When you check the managed resources in `Topology` section, you will no longer see Knative related resources.
++
+image:images/topology-new.png[,900]
+
 ====
