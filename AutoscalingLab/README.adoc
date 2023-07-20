@@ -220,7 +220,7 @@ It will print output similar to the following:
     "type": "ScalingLimited"
   }
 ]
----
+----
 +
 You should see `AbleToScale` condition type reporting `True` and `ScalingActive` condition type reporting `True` as well. Status reporting `TooFewReplicas` is not to be concerned for this lab. The sample Liberty application is using very little CPU resource and HPA is complaining that `minReplica` as 3 is too many.
 
