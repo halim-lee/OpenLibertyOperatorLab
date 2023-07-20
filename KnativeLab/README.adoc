@@ -5,7 +5,7 @@ endif::[]
 
 = Knative Serving Configuration
 
-This lab focuses on the configuration of Knative Serving for OpenLibertyApplication instances.
+This lab focuses on the configuration of Knative Serving for OpenLibertyApplication instances. Before proceeding with this lab, it is advisable to complete the AutoscalingLab.
 
 == Knative Serving
 `Knative Serving` simplifies the deployment of serverless applications by abstracting away infrastructure complexities. With serverless computing, users can deploy their applications without the burden of managing the underlying servers. The platform dynamically allocates machine resources as per demand, alleviating users from the worries of capacity planning, configuration, maintenance, and container scaling are abstracted away.
