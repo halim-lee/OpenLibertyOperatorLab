@@ -212,6 +212,41 @@ NAME                                              HOST/PORT                     
 route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-open-liberty-lab.apps.wsatest.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
 ----
 
+10. Check the status of the OpenLibertyApplication instance by running:
++
+[source,sh]
+----
+oc get OpenLibertyApplication knative-enabled-sample -ojson | jq '.status.conditions'
+----
++
+Then the output will be similar to the following:
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-07-20T05:16:03Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-07-20T05:16:05Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-07-20T05:16:05Z",
+    "message": "Deployment replicas ready: 1/1",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+----
++
+Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1.
+
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
@@ -292,7 +327,8 @@ The operator will delete Knative related resources and create new resources for 
 +
 image:images/status-conditions-new.png[,900]
 +
-When you check the managed resources in `Topology` section, you will no longer see Knative related resources.
++
+Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1. When you check the managed resources in `Topology` section, you will no longer see Knative related resources.
 +
 image:images/topology-new.png[,900]
 
