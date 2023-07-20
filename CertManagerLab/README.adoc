@@ -252,11 +252,7 @@ image:images/topology.png[,900]
 +
 image:images/ola.png[,900]
 
-7. Select `certificate-liberty-app` instance.
-+
-image:images/operator-details.png[,900]
-+
-At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
+7. Select `certificate-liberty-app` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
 +
 image:images/status-conditions.png[,900]
 
