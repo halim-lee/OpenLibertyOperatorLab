@@ -8,9 +8,9 @@ endif::[]
 This lab focuses on the TLS certification generate and configuration, as well as an integration of Certificate Manager for OpenLibertyApplication instances.
 
 == TLS Certificates Configuration
-An administrator can configure TLS certificates to secure applications that run on Kubernetes-based clusters. By default, the operator generates certificates. Instead, an administrator can specify certificates for the Route and Service. `cert-manager` tool enables the operator to automatically provision TLS certificates for Pods and Routes. Certificates are mounted into containers from a Kubernetes secret so that the certificates are automatically refreshed when they update. For more information about the tool, see https://cert-manager.io/.
+In Kubernetes-based clusters, administartors have the ability to configure TLS certificates to secure applications. By default, the operator takes care of generating certificates. However, the administrators also have the option to specify certificates for the Route and Service manually. To automate the provisioning of TLS certificates for Pods and Routes, the cert-manager tool comes into play. This tool enables the operator to handle the certificate provisioning process automatically. Moreover, certificates are securely mounted into containers from a Kubernetes secret, ensuring that they are regularly refreshed whenever updates occur. For more in-depth information about the cert-manager tool, you can refer to https://cert-manager.io/.
 
-There are three ways to generate and configure certificates with Open Liberty Operator, and the lab will walk you through each way. Before starting the lab, ensure that certificate manager is installed on the OpenShift cluster. If it is not already installed, please contact the Lab Administrators to have it installed.
+There are three methods to generate and configure certificates with Open Liberty Operator. The lab will provide a step-by-step walk-through of each approach. However, before starting the lab, ensure that the certificate manager is already installed on the OpenShift cluster. In case it is not installed, please reach out to the Lab Administrators for assistance with the installation process.
 
 == Configuration Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
