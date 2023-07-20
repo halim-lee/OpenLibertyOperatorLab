@@ -209,7 +209,7 @@ The `resources` field defines a metric source for targeted container resources. 
 +
 image:images/topology-new.png[,900]
 +
-When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` condition type reporting `True`.
+When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` condition type reporting `True` and `ScalingActive` condition type reporting `True` as well.
 +
 image:images/hpa-status-conditions.png[,900]
 
