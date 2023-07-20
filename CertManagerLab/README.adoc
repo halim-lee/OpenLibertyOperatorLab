@@ -250,7 +250,7 @@ image:images/topology.png[,900]
 
 6. If you would like to see the instance's status at once, click `Search` tab on the left and search for `OpenLibertyApplications` resource.
 +
-image:images/ola.png[,400]
+image:images/ola.png[,900]
 
 7. Select `certificate-liberty-app` instance.
 +
