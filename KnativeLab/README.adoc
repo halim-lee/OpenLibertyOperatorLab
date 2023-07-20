@@ -8,7 +8,9 @@ endif::[]
 This lab focuses on the configuration of Knative Serving for OpenLibertyApplication instances.
 
 == Knative Serving
-`Knative Serving` enables users to deploy and serve applications as serverless containers. Serverless computing allows users to deploy application without the hassle of worrying about the underlying infrastructure. This is possible because the service provider allocates machine resources on demand, taking care of the servers on behalf of their customers. Servers are still used, but the naming comes from absence of concerns for server management. For example, capacity planning, configuration, maintenance or scaling of containers. Knative Serving especially provides support for automatic scaling, routing and network programming, and point-in-time snapshots of deployed code and configurations.
+`Knative Serving` simplifies the deployment of serverless applications by abstracting away infrastructure complexities. With serverless computing, users can deploy their applications without the burden of managing the underlying servers. The platform dynamically allocates machine resources as per demand, alleviating users from the worries of capacity planning, configuration, maintenance, and container scaling are abstracted away.
+
+One of the key benefits of Knative Serving is its automatic scaling feature, which efficiently adjusts resource allocation based on workload demands. It also provides robust routing and network programming capabilities, enabling intelligent traffic distribution. Additionally, it provides support for point-in-time snapshots, allowing users to capture and manage previous versions of deployed code and configurations. This provides a safety net for seamless rollbacks and helps testing and version control for better application stability.
 
 == Configuration Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
