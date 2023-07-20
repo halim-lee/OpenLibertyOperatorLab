@@ -119,7 +119,8 @@ Then remove `replicas: 1` under `spec` field and replace it with the following:
     minReplicas: 3
     targetCPUUtilizationPercentage: 50
 ----
-The `resources` field defines a metrice source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range.
++
+The `resources` field defines a metric source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
 6. Check the status of the OpenLibertyApplication instance again by running:
 +
@@ -181,16 +182,28 @@ image:images/replicas.png[,500]
 +
 image:images/topology.png[,900]
 
-7. If you would like to see the instance's status at once, click link at `Managed by CSV`. This will direct you to Open Liberty Operator's details.
+7. If you would like to see the instance’s status at once, click Search tab on the left and search for OpenLibertyApplications resource. Select `autoscaling-liberty-app`.
 +
-image:images/csv.png[,400]
-
-8. Click `OpenLibertyApplication` tab and select `autoscaling-liberty-app` instance.
-+
-image:images/operator-details.png[,900]
+image:images/ola.png[,900]
 +
 At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
 +
 image:images/status-conditions.png[,900]
 
+8. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `autoscaling-liberty-app` instance again. Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` and `resources` field under `spec` field as the following:
++
+[source,yaml]
+----
+  resources:
+    requests:
+      cpu: "0.4"
+  autoscaling:
+    maxReplicas: 5
+    minReplicas: 3
+    targetCPUUtilizationPercentage: 50
+----
++
+The `resources` field defines a metric source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
+
 ====
+
