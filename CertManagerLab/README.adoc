@@ -322,4 +322,4 @@ Change `manageTLS: true` under `spec` field to `manageTLS: false`:
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
 13. Check the status of the OpenLibertyApplication instance again.
-
+====
