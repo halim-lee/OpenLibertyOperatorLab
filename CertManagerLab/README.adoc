@@ -271,8 +271,6 @@ image:images/cert-secrets.png[,900]
     type: ClusterIP
 ----
 +
-image:images/ocp-ca-configure.png[,900]
-+
 This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file.
 
 10. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a secret by clicking `Secrets`, `Create` and `From YAML`. Create a secret with the following content:
