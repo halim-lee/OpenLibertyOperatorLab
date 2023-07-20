@@ -155,6 +155,73 @@ It will print output similar to the following:
 ----
 Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
+7. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
++
+[source,sh]
+----
+oc get all -l app.kubernetes.io/part-of=autoscaling-liberty-app
+----
+It will print output similar to the following:
++
+[source,log]
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+pod/autoscaling-liberty-app-54946849f8-jl9lk   1/1     Running   0          10m
+pod/autoscaling-liberty-app-54946849f8-trnjk   1/1     Running   0          10m
+pod/autoscaling-liberty-app-54946849f8-xrkj6   1/1     Running   0          10m
+
+NAME                              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+service/autoscaling-liberty-app   ClusterIP   172.30.110.7   <none>        9443/TCP   21m
+
+NAME                                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/autoscaling-liberty-app   3/3     3            3           21m
+
+NAME                                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/autoscaling-liberty-app-54946849f8   3         3         3       11m
+replicaset.apps/autoscaling-liberty-app-54c9d846bc   0         0         0       21m
+
+NAME                                                          REFERENCE                            TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   2%/50%    3         5         3          11m
+----
+
+8. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected.
+
++
+[source,sh]
+----
+oc get hpa autoscaling-liberty-app -ojson | jq '.status.conditions'
+----
+It will print output similar to the following:
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-07-20T05:38:32Z",
+    "message": "recommended size matches current size",
+    "reason": "ReadyForNewScale",
+    "status": "True",
+    "type": "AbleToScale"
+  },
+  {
+    "lastTransitionTime": "2023-07-20T05:43:17Z",
+    "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+    "reason": "ValidMetricFound",
+    "status": "True",
+    "type": "ScalingActive"
+  },
+  {
+    "lastTransitionTime": "2023-07-20T05:43:17Z",
+    "message": "the desired replica count is less than the minimum replica count",
+    "reason": "TooFewReplicas",
+    "status": "True",
+    "type": "ScalingLimited"
+  }
+]
++
+You should see `AbleToScale` condition type reporting `True` and `ScalingActive` condition type reporting `True` as well. Status reporting `TooFewReplicas` is not to be concerned for this lab. The sample Liberty application is using very little CPU resource and HPA is complaining that `minReplica` as 3 is too many.
+----
+
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
@@ -209,7 +276,7 @@ The `resources` field defines a metric source for targeted container resources. 
 +
 image:images/topology-new.png[,900]
 +
-When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` condition type reporting `True` and `ScalingActive` condition type reporting `True` as well.
+When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` condition type reporting `True` and `ScalingActive` condition type reporting `True` as well. Status reporting `TooFewReplicas` is not to be concerned for this lab. The sample Liberty application is using very little CPU resource and HPA is complaining that `minReplica` as 3 is too many.
 +
 image:images/hpa-status-conditions.png[,900]
 
