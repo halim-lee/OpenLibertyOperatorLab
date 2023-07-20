@@ -99,6 +99,7 @@ It will print output similar to the following:
   }
 ]
 ----
++
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
 5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
@@ -153,6 +154,7 @@ It will print output similar to the following:
   }
 ]
 ----
++
 Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
 7. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
@@ -185,12 +187,12 @@ horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autosca
 ----
 
 8. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected.
-
 +
 [source,sh]
 ----
 oc get hpa autoscaling-liberty-app -ojson | jq '.status.conditions'
 ----
++
 It will print output similar to the following:
 +
 [source,log]
