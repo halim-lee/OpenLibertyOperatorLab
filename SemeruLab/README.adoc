@@ -304,6 +304,7 @@ replicaset.apps/semeru-enabled-sample-756fd76b8f                     1         1
 .*Method B: Deployment through OpenShift Web Console*
 [%collapsible]
 ====
+
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assgined with for the lab.
@@ -317,25 +318,120 @@ image:images/operator-backed.png[,500]
 4. Click OpenLibertyApplication and create an instance.
 +
 image:images/create-instance.png[,800]
-
-5. Change the OpenLibertyApplication instance to `semeru-enabled-sample` under *Name* field. Set replicas to 1.
 +
-image:images/replicas.png[,500]
+Select YAML view and copy the following content:
++
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: semeru-enabled-sample
+spec:
+  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
+  replicas: 3
+  semeruCloudCompiler:
+    enable: true
+    replicas: 1
+----
++
+This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
 
-6. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
+5. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
 +
 image:images/topology.png[,900]
++
+The certificates are not reflected here, but you can check the certificates using `svcCertSecretName` and `tlsSecretName` in the status output above. These certificates are created and managed by the Cert Manager, which was covered before this lab. They are injected into the application as well as the JIT server via the secret by the operator.
 
-7. If you would like to see the instance's status at once, click link at `Managed by CSV`. This will direct you to Open Liberty Operator's details.
+6. If you would like to see the instance's status at once, click `Search` tab on the left and search for `OpenLibertyApplications` resource.
 +
-image:images/csv.png[,400]
+image:images/ola.png[,900]
 
-8. Click `OpenLibertyApplication` tab and select `semeru-enabled-sample` instance.
-+
-image:images/operator-details.png[,900]
-+
-At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
+7. Select `semeru-enabled-sample` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
 +
 image:images/status-conditions.png[,900]
++
+As in the example output, `status` field shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
+
+8. Click `YAML` tab to see semeru related properties in the status section as well.
++
+image:images/status-conditions-semeru.png[,900]
++
+It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
+
+9. Check the logs of JIT server pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-1`.
++
+image:images/semeru-deployment.png[,900]
++
+Click `Pods` tab and the pod's name.
++
+image:images/semeru-pod.png[,700]
++
+Click `Logs` tab. You should be able to see JITServer logs reporting that the server allocated a new client session.
++
+image:images/semeru-logs.png[,700]
++
+You can see that there are clients connected to the JITServer with unique client ID for each application pod.
+
+10. Check the logs of Liberty application pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample`.
++
+image:images/app-deployment.png[,900]
++
+Click `Pods` tab and choose any of the three pods.
++
+image:images/app-pods.png[,700]
++
+Click `Logs` tab.
++
+image:images/app-logs.png[,700]
++
+You can see that the Liberty application is successfully connected to JIT Server pod.
+
+11. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Modify the application image to another image and the number of replicas to see the changes more clearly. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `semeru-enabled-sample` instance again. Edit the OpenLibertyApplication instance as the following: 
++
+Change `applicationImage` to "icr.io/appcafe/websphere-liberty:kernel-java11-openj9-ubi" and `replicas` to 4 under `spec` field:
++
+[source,yaml]
+----
+  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java11-openj9-ubi
+  replicas: 4
+----
+
+12. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance.
++
+image:images/deployment-loading.png[,700]
++
+When the application is not fully updated with the new image, there will be 2 Semeru deployments. This is to ensure deployments with older image is still connected to the first version of Semeru while updating. Wait until the Liberty app deployment’s pods are all updated to the new image and there is only 1 Semeru deployment.
++
+image:images/topology-new.png[,700]
++
+You can see that the JIT Server’s deployment name has been changed from semeru-enabled-sample-semeru-compiler-1 to semeru-enabled-sample-semeru-compiler-2. This is a new set of JIT Server sessions with the Liberty app.
+
+13. Check the logs of JIT server pods to ensure 4 connections are established. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-2`. Click `Pods` tab and the pod's name. Then click `Logs` tab. You should be able to see JITServer logs reporting that the server allocated 4 new client sessions, instead of 3.
++
+image:images/semeru-logs-new.png[,700]
+
+14. You can also detect the changes in OpenLibertyApplication instance’s status report as well. Click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `semeru-enabled-sample` instance. Click `YAML` tab to see semeru related properties in the status section.
++
+image:images/status-conditions-new.png[,900]
++
+The version check enables easy cleanup of the old version of JIT Server with the numbering naming convention.
+
+15. To disable JIT Server integration, make changes to the OpenLibertyApplication instance. 
++
+Change `.spec.semeruCloudCompiler.enable` to false:
++
+[source,yaml]
+----
+  semeruCloudCompiler:
+    enable: false
+----
+
+16. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance.
++
+image:images/topology-no-semeru.png[,700]
++
+You will be able to see that the pods of JIT Server are now removed.
 
 ====
+
