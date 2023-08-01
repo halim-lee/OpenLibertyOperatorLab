@@ -111,8 +111,20 @@ As in the example output, `status` field shows the number of running replicas ou
 +
 [source,sh]
 ----
-oc get secrets -n $NAMESPACE
+oc get secret certificate-liberty-app-svc-tls-cm -n $NAMESPACE
 oc get issuers -n $NAMESPACE -o wide
+----
++
+The output should be similar to the following:
++
+[source,log]
+----
+NAME                                 TYPE                DATA   AGE
+certificate-liberty-app-svc-tls-cm   kubernetes.io/tls   3      6m13s
+
+NAME              READY   STATUS                AGE
+olo-ca-issuer     True    Signing CA verified   12d
+olo-self-signed   True                          12d
 ----
 
 6. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
