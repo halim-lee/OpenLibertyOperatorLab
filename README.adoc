@@ -15,16 +15,7 @@ If you are interested in gaining in-depth knowledge about Open Liberty Operator,
 == Lab Prerequisites
 Before starting the lab, please ensure you meet the following requirements:
 
-1. Access to an OpenShift cluster with Open Liberty Operator already installed.
-+
-[source,sh]
-----
-oc login <CLUSTER_URL> -u <CLUSTER_USER> -p <CLUSTER_TOKEN> --insecure-skip-tls-verify=true
-export NAMESPACE=<ASSIGNED_NAMESPACE>
-oc project $NAMESPACE
-----
-** CLUSTER_URL, CLUSTER_USER, CLUSTER_TOKEN and ASSIGNED_NAMESPACE will be provided to you before the lab. If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
-2. The `oc` client installed on your system. If you do not have it installed, follow the steps:
+1. The `oc` client installed on your system. If you do not have it installed, follow the steps:
 ** Download the client through the link:++https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/++[link]:
 *** Intel Mac: openshift-client-mac.tar.gz
 *** M1/M2 Mac: openshift-client-mac-arm64.tar.gz
@@ -40,6 +31,15 @@ sudo mv oc kubectl /usr/local/bin/
 *** Windows:
 +
 Copy the `oc` and `kubectl` files to your binary directory.
+2. Access to an OpenShift cluster with Open Liberty Operator already installed.
++
+[source,sh]
+----
+oc login <CLUSTER_URL> -u <CLUSTER_USER> -p <CLUSTER_TOKEN> --insecure-skip-tls-verify=true
+export NAMESPACE=<ASSIGNED_NAMESPACE>
+oc project $NAMESPACE
+----
+** CLUSTER_URL, CLUSTER_USER, CLUSTER_TOKEN and ASSIGNED_NAMESPACE will be provided to you before the lab. If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
 3. Ensure `jq` is installed.
 ** Download and install the binary through the link:++https://jqlang.github.io/jq/download/++[link].
 
