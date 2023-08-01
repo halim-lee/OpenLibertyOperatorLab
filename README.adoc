@@ -32,7 +32,9 @@ sudo mv oc kubectl /usr/local/bin/
 ----
 *** Windows:
 +
-Copy the file to your binary directory.
+Copy the `oc` and `kubectl` files to your binary directory.
+3. Ensure `jq` is installed.
+** Download and install the binary through the link:++https://jqlang.github.io/jq/download/++[link]
 
 == Kubernetes Basics
 If you are new to containers and Kubernetes, see below to learn the basics.
