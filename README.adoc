@@ -16,7 +16,14 @@ If you are interested in gaining in-depth knowledge about Open Liberty Operator,
 Before starting the lab, please ensure you meet the following requirements:
 
 1. Access to an OpenShift cluster with Open Liberty Operator already installed.
-** If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
++
+[source,sh]
+----
+oc login <CLUSTER_URL> -u <CLUSTER_USER> -p <CLUSTER_TOKEN> --insecure-skip-tls-verify=true
+export NAMESPACE=<ASSIGNED_NAMESPACE>
+oc project $NAMESPACE
+----
+** CLUSTER_URL, CLUSTER_USER, CLUSTER_TOKEN and ASSIGNED_NAMESPACE will be provided to you before the lab. If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
 2. The `oc` client installed on your system. If you do not have it installed, follow the steps:
 ** Download the client through the link:++https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/++[link]:
 *** Intel Mac: openshift-client-mac.tar.gz
