@@ -143,7 +143,9 @@ Then add `service` field under `spec` field as the following:
     type: ClusterIP
 ----
 +
-This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file. Run the following to see if the secret is successfully created.
+This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file
+
+7. Run the following to see if the secret is successfully created:
 +
 [source,sh]
 ----
@@ -157,7 +159,7 @@ NAME                                  TYPE                DATA   AGE
 certificate-liberty-app-svc-tls-ocp   kubernetes.io/tls   2      3m38s
 ----
 
-7. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
+8. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -176,7 +178,7 @@ data:
 +
 Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues certifiactes for the service by using the provided CA.
 
-8. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create a YAML file called `cert-issuer.yaml` with the following content:
+9. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create a YAML file called `cert-issuer.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -197,7 +199,7 @@ spec:
 +
 Note that the issuer's name is `olo-custom-issuer`. This way, the operator knows that a custom issuer exists.
 
-9. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
+10. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
 +
 [source,sh]
 ----
@@ -213,7 +215,7 @@ Then change `manageTLS: true` under `spec` field to `manageTLS: false`:
 +
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
-10. Check the status of the OpenLibertyApplication instance again by running:
+11. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
