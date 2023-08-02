@@ -138,11 +138,24 @@ Then add `service` field under `spec` field as the following:
 ----
   service:
     annotations:
-      service.beta.openshift.io/serving-cert-secret-name: my-app-svc-tls-ocp
+      service.beta.openshift.io/serving-cert-secret-name: certificate-liberty-app-svc-tls-ocp
     port: 9443
+    type: ClusterIP
 ----
 +
-This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file.
+This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file. Run the following to see if the secret is successfully created.
++
+[source,sh]
+----
+oc get secret certificate-liberty-app-svc-tls-ocp
+----
+Then you should see similar to the following:
++
+[source,yaml]
+----
+NAME                                  TYPE                DATA   AGE
+certificate-liberty-app-svc-tls-ocp   kubernetes.io/tls   2      3m38s
+----
 
 7. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
 +
