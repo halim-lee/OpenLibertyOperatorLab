@@ -35,8 +35,8 @@ kind: OpenLibertyApplication
 metadata:
   name: semeru-enabled-sample
 spec:
-  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
-  replicas: 3
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 2
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -74,7 +74,7 @@ It will print output similar to the following:
   },
   {
     "lastTransitionTime": "2023-05-11T18:21:30Z",
-    "message": "Deployment replicas ready: 3/3",
+    "message": "Deployment replicas ready: 2/2",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
     "type": "ResourcesReady"
@@ -191,7 +191,7 @@ metadata:
   name: semeru-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/websphere-liberty:kernel-java11-openj9-ubi
-  replicas: 4
+  replicas: 3
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -277,7 +277,7 @@ kind: OpenLibertyApplication
 metadata:
   name: semeru-enabled-sample
 spec:
-  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 3
   semeruCloudCompiler:
     enable: false
@@ -328,8 +328,8 @@ kind: OpenLibertyApplication
 metadata:
   name: semeru-enabled-sample
 spec:
-  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java17-openj9-ubi
-  replicas: 3
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 2
   semeruCloudCompiler:
     enable: true
     replicas: 1
