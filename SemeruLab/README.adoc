@@ -36,7 +36,7 @@ metadata:
   name: semeru-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 2
+  replicas: 1
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -74,7 +74,7 @@ It will print output similar to the following:
   },
   {
     "lastTransitionTime": "2023-05-11T18:21:30Z",
-    "message": "Deployment replicas ready: 2/2",
+    "message": "Deployment replicas ready: 1/1",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
     "type": "ResourcesReady"
@@ -191,7 +191,7 @@ metadata:
   name: semeru-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/websphere-liberty:kernel-java11-openj9-ubi
-  replicas: 3
+  replicas: 2
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -278,7 +278,7 @@ metadata:
   name: semeru-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 3
+  replicas: 1
   semeruCloudCompiler:
     enable: false
 ----
@@ -393,8 +393,8 @@ Change `applicationImage` to "icr.io/appcafe/websphere-liberty:kernel-java11-ope
 +
 [source,yaml]
 ----
-  applicationImage: icr.io/appcafe/websphere-liberty:kernel-java11-openj9-ubi
-  replicas: 4
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 2
 ----
 
 12. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance.
