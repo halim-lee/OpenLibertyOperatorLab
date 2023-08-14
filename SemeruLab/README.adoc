@@ -37,6 +37,13 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
   semeruCloudCompiler:
     enable: true
     replicas: 1
@@ -286,6 +293,13 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
   semeruCloudCompiler:
     enable: false
     resources:
@@ -344,6 +358,13 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 2
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
   semeruCloudCompiler:
     enable: true
     replicas: 1
