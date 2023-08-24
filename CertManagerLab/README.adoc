@@ -18,7 +18,24 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 .*Method A: Deployment through `oc` client*
 [%collapsible]
 ====
-1. To set your current namespace to be the namespace you will be working in, run the following commands:
+1. Make sure you have `oc` client installed in your system and are logged into a RedHat OpenShift cluster before you begin the lab.
++
+[source,sh]
+----
+oc login --server=https://<cluster-api-ip-address>:6443 --username=<username> --password=<password>
+----
++
+For example:
++
+[source,sh]
+----
+oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+----
++
+If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
+
+
+2. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -29,7 +46,7 @@ oc project $NAMESPACE
 ----
 
 
-2. Create a YAML file called `liberty-certificate.yaml` with the following content:
+3. Create a YAML file called `liberty-certificate.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -63,7 +80,7 @@ spec:
       failureThreshold: 12
 ----
 
-3. Create the OpenLibertyApplication instance using the command:
+4. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -72,7 +89,7 @@ oc apply -f liberty-certificate.yaml
 +
 This will create a Deployment named `certificate-liberty-app` with 1 replica. By setting `.spec.manageTLS` field to true, the operator attempts to generate certificates and mount them to the pod at `/etc/x509/certs`. Port `9443` is used as the default service port. Since `.spec.expose` field is set to true, the Route is also configured automatically to enable TLS by using `reencrypt` termination.
 
-4. Check the status of the OpenLibertyApplication instance by running:
+5. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -107,7 +124,7 @@ It will print output similar to the following:
 +
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Verify that a Certificate Authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
+6. Verify that a Certificate Authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
 +
 [source,sh]
 ----
@@ -126,7 +143,7 @@ olo-ca-issuer     True    Signing CA verified   49s
 olo-self-signed   True                          49s
 ----
 
-6. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
+7. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
 +
 [source,sh]
 ----
@@ -145,7 +162,7 @@ Then add `service` field under `spec` field as the following:
 +
 This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file
 
-7. Run the following to see if the secret is successfully created:
+8. Run the following to see if the secret is successfully created:
 +
 [source,sh]
 ----
@@ -159,7 +176,7 @@ NAME                                  TYPE                DATA   AGE
 certificate-liberty-app-svc-tls-ocp   kubernetes.io/tls   2      3m38s
 ----
 
-8. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
+9. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -178,7 +195,7 @@ data:
 +
 Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues certifiactes for the service by using the provided CA.
 
-9. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create a YAML file called `cert-issuer.yaml` with the following content:
+10. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create a YAML file called `cert-issuer.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -199,7 +216,7 @@ spec:
 +
 Note that the issuer's name is `olo-custom-issuer`. This way, the operator knows that a custom issuer exists.
 
-10. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
+11. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
 +
 [source,sh]
 ----
@@ -215,7 +232,7 @@ Then change `manageTLS: true` under `spec` field to `manageTLS: false`:
 +
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
-11. Check the status of the OpenLibertyApplication instance again by running:
+12. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
