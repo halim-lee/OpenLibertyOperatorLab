@@ -90,7 +90,8 @@ This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
 ----
 oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
 ----
-It will print output similar to the following:
++
+It should print output that the application is `Reconciled`, `Ready` and `ResourcesReady` similar to the following:
 +
 [source,log]
 ----
