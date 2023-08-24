@@ -18,7 +18,24 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 .*Method A: Deployment through `oc` client*
 [%collapsible]
 ====
-1. To set your current namespace to be the namespace you will be working in, run the following commands:
+1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
++
+[source,sh]
+----
+oc login --server=https://<cluster-api-ip-address>:6443 --username=<username> --password=<password>
+----
++
+For example:
++
+[source,sh]
+----
+oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+----
++
+If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
+
+
+2. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -28,7 +45,7 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 
-2. Ensure `Red Hat OpenShift Serverless` operator is installed on the cluster and Knative Serving instance is Ready.
+3. Ensure `Red Hat OpenShift Serverless` operator is installed on the cluster and Knative Serving instance is Ready.
 +
 [source,sh]
 ----
@@ -46,7 +63,7 @@ NAME              VERSION   READY   REASON
 knative-serving   1.8       True 
 ----
 
-3. Create a YAML file called `knative-enabled-sample.yaml` with the following content:
+4. Create a YAML file called `knative-enabled-sample.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -64,7 +81,7 @@ spec:
     type: ClusterIP
 ----
 
-4. Create the OpenLibertyApplication instance using the command:
+5. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -73,7 +90,7 @@ oc apply -f knative-enabled-sample.yaml
 +
 The operator will create a Knative Service resource which manages the entire life cycle of a workload.
 
-5. Check the status of the OpenLibertyApplication instance by running:
+6. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -106,7 +123,7 @@ It will print output similar to the following:
 +
 As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-6. Check the managed resources and their statuses. Run the command: 
+7. Check the managed resources and their statuses. Run the command: 
 +
 [source,sh]
 ----
@@ -145,7 +162,7 @@ configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sampl
 +
 It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application. Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero.
 
-7. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
+8. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
 +
 [source,sh]
 ----
@@ -162,7 +179,7 @@ Access the page, and you will be able to see the sample Liberty app page.
 +
 image:images/sample-app-page.png[,700]
 
-8. Edit OpenLibertyApplication to disable Knative configuration. Change `createKnativeService` field to false.
+9. Edit OpenLibertyApplication to disable Knative configuration. Change `createKnativeService` field to false.
 +
 [source,sh]
 ----
@@ -185,7 +202,7 @@ spec:
     type: ClusterIP
 ----
 
-9. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
+10. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
 +
 [source,sh]
 ----
@@ -212,7 +229,7 @@ NAME                                              HOST/PORT                     
 route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-open-liberty-lab.apps.wsatest.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
 ----
 
-10. Check the status of the OpenLibertyApplication instance by running:
+11. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
