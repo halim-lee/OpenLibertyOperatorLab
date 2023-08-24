@@ -16,7 +16,24 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 .*Method A: Deployment through `oc` client*
 [%collapsible]
 ====
-1. To set your current namespace to be the namespace you will be working in, run the following commands:
+1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
++
+[source,sh]
+----
+oc login --server=https://<cluster-api-ip-address>:6443 --username=<username> --password=<password>
+----
++
+For example:
++
+[source,sh]
+----
+oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+----
++
+If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
+
+
+2. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -26,7 +43,7 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 
-2. Create a YAML file called `liberty-semeru.yaml` with the following content:
+3. Create a YAML file called `liberty-semeru.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -56,7 +73,7 @@ spec:
         memory: 50Mi
 ----
 
-3. Create the OpenLibertyApplication instance using the command:
+4. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -64,7 +81,7 @@ oc apply -f liberty-semeru.yaml
 ----
 This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
 
-4. Check the status of the OpenLibertyApplication instance by running:
+5. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -97,7 +114,7 @@ It will print output similar to the following:
 ----
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Check semeru related properties in the status section as well.
+6. Check semeru related properties in the status section as well.
 +
 [source,sh]
 ----
@@ -120,7 +137,7 @@ It will print output similar to the following:
 ----
 It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
 
-6. You can check what resources are managed by the operator through a command.
+7. You can check what resources are managed by the operator through a command.
 +
 [source,sh]
 ----
@@ -149,7 +166,7 @@ replicaset.apps/semeru-enabled-sample-semeru-compiler-1-77c8d48749   1         1
 +
 The certificates are not reflected here, but you can check the certificates using `svcCertSecretName` and `tlsSecretName` in the status output above. These certificates are created and managed by the Cert Manager, which was covered before this lab. They are injected into the application as well as the JIT server via the secret by the operator.
 
-7. Check the logs of JIT server pods. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample-semeru-compiler-1`...
+8. Check the logs of JIT server pods. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample-semeru-compiler-1`...
 +
 [source,sh]
 ----
@@ -169,7 +186,7 @@ JITServer is ready to accept incoming requests
 +
 You can see that there are clients connected to the JITServer with unique client ID for each application pod.
 
-8. Check the Liberty application log to ensure the connection with JIT Server. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample`...
+9. Check the Liberty application log to ensure the connection with JIT Server. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample`...
 +
 [source,sh]
 ----
@@ -190,7 +207,7 @@ It will print output similar to the following:
 +
 You can see that the Liberty application is successfully connected to JIT Server pod.
 
-9. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Modify the application image to another image and the number of replicas to see the changes more clearly.
+10. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Modify the application image to another image and the number of replicas to see the changes more clearly.
 +
 [source,sh]
 ----
@@ -211,14 +228,14 @@ spec:
     replicas: 1
 ----
 
-10. Wait until the Liberty app deployment's pods are all updated to the new image.
+11. Wait until the Liberty app deployment's pods are all updated to the new image.
 +
 [source,sh]
 ----
 oc get deployment semeru-enabled-sample
 ----
 
-11. When all pods are ready and running, check the status of managed resources.
+12. When all pods are ready and running, check the status of managed resources.
 +
 [source,sh]
 ----
@@ -251,7 +268,7 @@ You can see that the JIT Server's deployment name has been changed from `semeru-
 oc logs semeru-enabled-sample-semeru-compiler-2-494jdp493-39dj9
 ----
 
-12. You can also detect the changes in OpenLibertyApplication instance's status report as well.
+13. You can also detect the changes in OpenLibertyApplication instance's status report as well.
 +
 [source,sh]
 ----
@@ -275,7 +292,7 @@ It will print output similar to the following:
 +
 The version check enables easy cleanup of the old version of JIT Server with the numbering naming convention.
 
-13. To disable JIT Server integration, make changes to the OpenLibertyApplication instance.
+14. To disable JIT Server integration, make changes to the OpenLibertyApplication instance.
 +
 [source,sh]
 ----
