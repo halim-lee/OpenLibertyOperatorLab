@@ -16,7 +16,23 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 .*Method A: Deployment through `oc` client*
 [%collapsible]
 ====
-1. To set your current namespace to be the namespace you will be working in, run the following commands:
+1. Make sure you have `oc` client installed in your system and are logged into a RedHat OpenShift cluster before you begin the lab.
++
+[source,sh]
+----
+oc login --server=https://<cluster-api-ip-address>:6443 --username=<username> --password=<password>
+----
++
+For example:
++
+[source,sh]
+----
+oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+----
++
+If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
+
+2. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -27,7 +43,7 @@ oc project $NAMESPACE
 ----
 
 
-2. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
+3. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -60,7 +76,7 @@ spec:
       failureThreshold: 12
 ----
 
-3. Create the OpenLibertyApplication instance using the command:
+4. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -68,7 +84,7 @@ oc apply -f liberty-autoscaling.yaml
 ----
 This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
 
-4. Check the status of the OpenLibertyApplication instance by running:
+5. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -102,7 +118,7 @@ It will print output similar to the following:
 +
 As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-5. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
+6. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
 +
 [source,sh]
 ----
@@ -123,7 +139,7 @@ Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
 The `resources` field defines a metric source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-6. Check the status of the OpenLibertyApplication instance again by running:
+7. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
@@ -157,7 +173,7 @@ It will print output similar to the following:
 +
 Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
-7. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
+8. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
 [source,sh]
 ----
@@ -186,7 +202,7 @@ NAME                                                          REFERENCE         
 horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   2%/50%    3         5         3          11m
 ----
 
-8. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected.
+9. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected.
 +
 [source,sh]
 ----
