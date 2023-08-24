@@ -18,7 +18,7 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 .*Method A: Deployment through `oc` client*
 [%collapsible]
 ====
-1. Make sure you have `oc` client installed in your system and are logged into a RedHat OpenShift cluster before you begin the lab.
+1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
 +
 [source,sh]
 ----
