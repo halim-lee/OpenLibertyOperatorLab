@@ -4,10 +4,10 @@ Welcome to the Open Liberty Operator Labs. This series of labs is designed to he
 
 During the lab sessions, you will have the opportunity to explore the following features:
 
-* Horizontal Pod Autoscaling with CPU and Memory resource constraints
-* Knative services
-* Semeru Cloud Compiler (JIT Server integration)
-* Certificate management and TLS
+* link:++AutoscalingLab++[Horizontal Pod Autoscaling with CPU and Memory resource constraints]
+* link:++KnativeLab++[Knative services]
+* link:++SemeruLab++[Semeru Cloud Compiler (JIT Server integration)]
+* link:++CertManagerLab++[Certificate management and TLS]
 
 == Open Liberty Operator
 If you are interested in gaining in-depth knowledge about Open Liberty Operator, refer to the link:++https://github.com/OpenLiberty/open-liberty-operator/blob/main/doc/user-guide-v1.adoc++[documentation].
