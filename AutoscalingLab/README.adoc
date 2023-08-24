@@ -125,7 +125,7 @@ As in the example output, `status` field shows the number of running replicas ou
 ----
 oc edit OpenLibertyApplication autoscaling-liberty-app
 ----
-Then remove `replicas: 1` under `spec` field and replace it with the following:
+Then remove `replicas: 1` and `resources: {}` under `spec` field and replace them with the following:
 +
 [source,yaml]
 ----
