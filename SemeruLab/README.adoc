@@ -57,20 +57,23 @@ spec:
   resources:
     limits:
       cpu: 10m
-      memory: 50Mi
+      memory: 32Mi
     requests:
       cpu: 10m
-      memory: 50Mi
+      memory: 32Mi
   semeruCloudCompiler:
     enable: true
     replicas: 1
     resources:
       limits:
         cpu: 10m
-        memory: 50Mi
+        memory: 64Mi
       requests:
         cpu: 10m
-        memory: 50Mi
+        memory: 64Mi
+  service:
+    port: 9443
+    type: ClusterIP
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
