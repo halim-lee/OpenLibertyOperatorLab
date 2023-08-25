@@ -383,31 +383,31 @@ spec:
 +
 This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
 
-5. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
+5. You will see that an instance is created in `Topology` tab. Click `OLA semeru-enabled-sample`. You can select a resource on the right that you wish to investigate.
 +
 image:images/topology.png[,900]
 +
 The certificates are not reflected here, but you can check the certificates using `svcCertSecretName` and `tlsSecretName` in the status output above. These certificates are created and managed by the Cert Manager, which was covered before this lab. They are injected into the application as well as the JIT server via the secret by the operator.
 
-6. If you would like to see the instance's status at once, click `Search` tab on the left and search for `OpenLibertyApplications` resource.
+6. Check the OpenLibertyApplication instance's status. Click 3 dots beside `OLA semeru-enabled-sample`, then `Edit OpenLibertyApplication`.
 +
-image:images/ola.png[,900]
+image:images/ola.png[,500]
++
+Select `Details` tab and scroll to the bottom of the page to see the status conditions. 
++
+image:images/status.png[,900]
++
+As in the example image, `ResourcesReady` type shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
 
-7. Select `semeru-enabled-sample` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
-+
-image:images/status-conditions.png[,900]
-+
-As in the example output, `status` field shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
-
-8. Click `YAML` tab to see semeru related properties in the status section as well.
+8. Click `YAML` tab and scroll to the bottom to see semeru related properties in the status section as well.
 +
 image:images/status-conditions-semeru.png[,900]
 +
-It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. Then shows Semeru's generation and completed number under `.status.references`.
+It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. It also shows Semeru's generation and completed number under `.status.references`.
 
 9. Check the logs of JIT server pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-1`.
 +
-image:images/semeru-deployment.png[,400]
+image:images/semeru-deployment.png[,900]
 +
 Click `Pods` tab and the pod's name.
 +
