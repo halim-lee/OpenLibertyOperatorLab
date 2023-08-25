@@ -369,6 +369,10 @@ image:images/perspective.png[,300]
 3. Click `+Add`. Under `Developer Catalog`, click `Operator Backed`. This page shows the operator catalog on the cluster and enables you to deploy operator managed services.
 +
 image:images/operator-backed.png[,500]
++
+Make sure you see *Knative Serving* in the list. If not, please contact Lab Administrator to have it installed.
++
+image:images/operator-backed-knative.png[,800]
 
 4. Click OpenLibertyApplication and create an instance.
 +
@@ -383,7 +387,7 @@ kind: OpenLibertyApplication
 metadata:
   name: knative-enabled-sample
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:e32f0eb0feff73c6bc8416fe2f7aa0cb74cbaa325cae5fad636325ee0ac4a105
   replicas: 1
   createKnativeService: true
   expose: true
@@ -394,17 +398,17 @@ spec:
 +
 The operator will create a Knative Service resource which manages the entire life cycle of a workload.
 
-5. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
+5. You will see that an instance is created in `Topology` tab. Select `KSVC knative-enabled-sample` below the icon. You can select a resource that you would like to investigate.
 +
 image:images/topology.png[,900]
 +
 It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application. Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero.
 
-6. If you would like to see the instance's status at once, click `Search` tab on the left and search for `OpenLibertyApplications` resource.
+6. Check the OpenLibertyApplication instance's status. Click 3 dots beside `OLA knative-enabled-sample`, then `Edit OpenLibertyApplication`.
 +
 image:images/ola.png[,900]
-
-7. Select `knative-enabled-sample` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
++
+Select `Details` tab and scroll to the bottom of the page to see the status conditions. 
 +
 image:images/status-conditions.png[,900]
 +
