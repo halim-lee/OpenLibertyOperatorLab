@@ -263,6 +263,8 @@ spec:
       cpu: 10m
       memory: 32Mi
 ----
++
+This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
 
 6. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
 +
@@ -280,16 +282,13 @@ image:images/status-conditions.png[,900]
 +
 [source,yaml]
 ----
-  resources:
-    requests:
-      cpu: "0.4"
   autoscaling:
-    maxReplicas: 5
-    minReplicas: 3
+    maxReplicas: 3
+    minReplicas: 2
     targetCPUUtilizationPercentage: 50
 ----
 +
-The `resources` field defines a metric source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
+In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
 9. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
 +
