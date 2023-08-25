@@ -67,6 +67,9 @@ spec:
   service:
     port: 9443
     type: ClusterIP
+  deployment:
+    updateStrategy:
+      type: Recreate
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
