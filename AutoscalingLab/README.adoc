@@ -76,11 +76,11 @@ spec:
       failureThreshold: 12
   resources:
     limits:
-      cpu: 15m
-      memory: 50Mi
+      cpu: 30m
+      memory: 64Mi
     requests:
-      cpu: 15m
-      memory: 50Mi
+      cpu: 30m
+      memory: 64Mi
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
