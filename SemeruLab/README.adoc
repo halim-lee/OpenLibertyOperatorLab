@@ -395,7 +395,7 @@ image:images/ola.png[,500]
 +
 Select `Details` tab and scroll to the bottom of the page to see the status conditions. 
 +
-image:images/status.png[,900]
+image:images/status.png[,700]
 +
 As in the example image, `ResourcesReady` type shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
 
@@ -421,7 +421,7 @@ You can see that there are clients connected to the JITServer with unique client
 
 10. Check the logs of Liberty application pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample`.
 +
-image:images/app-deployment.png[,400]
+image:images/app-deployment.png[,900]
 +
 Click `Pods` tab and choose any of the three pods.
 +
@@ -433,14 +433,15 @@ image:images/app-logs.png[,900]
 +
 You can see that the Liberty application is successfully connected to JIT Server pod.
 
-11. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Modify the application image to another image and the number of replicas to see the changes more clearly. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `semeru-enabled-sample` instance again. Edit the OpenLibertyApplication instance as the following: 
+11. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Click 3 dots beside `OLA semeru-enabled-sample`, then `Edit OpenLibertyApplication`.
 +
-Change `applicationImage` to "icr.io/appcafe/websphere-liberty:kernel-java11-openj9-ubi" and `replicas` to 4 under `spec` field:
+image:images/ola.png[,500]
++
+Modify `applicationImage` field under `spec` field to another image.
 +
 [source,yaml]
 ----
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 2
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:e22dd56a05e44618a10d275d3ff07a38eb364c0f04f86ffe9618d83dd5467860
 ----
 
 12. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance.
