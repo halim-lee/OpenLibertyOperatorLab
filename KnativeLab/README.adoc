@@ -241,7 +241,7 @@ knative-enabled-sample-00002   knative-enabled-sample                      2    
 +
 You can now see 2 revision outputs. Notice `knative-enabled-sample-00002` instance's generation value is 2 and the replicas are running under that revision.
 
-12. You can rollback to the previous revision, separate traffic to both revisions and also rollout to the latest revision. Edit Knative service to use both revisions.
+12. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit Knative service to use both revisions.
 +
 [source,sh]
 ----
@@ -434,9 +434,24 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started:latest
 ----
 
-9. 
+9. Access the page through route again, and you will now be able to see the sample Liberty app page with Open Liberty 23.0.0.7.
++
+image:images/sample-app-page-new.png[,700]
 
-9. Edit the OpenLibertyApplication instance to disable Knative configuration. Change `createKnativeService` field to false. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `knative-enabled-sample` instance again. Edit the OpenLibertyApplication instance as the following: 
+10. You will see that there are 2 revisions and the latest revision `knative-enabled-sample-00002` has 100% written on the right side. This captures point-in-time snapshot of the Knative service. 100% of the traffic is routed to the latest revision. Note that the replicas may be 0’s by idle pod.
++
+image:images/revisions-new.png[,900]
+
+11. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit the traffic distribution. Click `Set traffic distribution` on the right side of `Revisions` and distribute traffic to both revisions by 50%.
++
+image:images/traffic-distribution.png[,900]
+
+12. Access the page through route again. The traffic can be routed to any of the two revisions by 50% chance. You can see that the running pod is assigned to the first revision below. The running pod may change to the latest revision from time to time because there is only 1 running pod and 50% will occupy the single pod.
++
+image:images/topology-new.png[,900]
++
+
+13. Edit the OpenLibertyApplication instance to disable Knative configuration. Change `createKnativeService` field to false under `spec` field: 
 +
 Change `createKnativeService: true` under `spec` field to `createKnativeService: false`:
 +
@@ -447,12 +462,12 @@ Change `createKnativeService: true` under `spec` field to `createKnativeService:
 +
 The operator will delete Knative related resources and create new resources for the application.
 
-10. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created. Check the managed resources and the status of the OpenLibertyApplication instance again.
+14. Select `Details` tab and scroll down to see the status conditions.
 +
-image:images/status-conditions-new.png[,900]
+image:images/status-new.png[,900]
 +
-Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1. When you check the managed resources in `Topology` section, you will no longer see Knative related resources.
+Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1. When you check the managed resources in `Topology` section, you will no longer see Knative related resources. You will see that new Deployment, Service and Route resources are created.
 +
-image:images/topology-new.png[,900]
+image:images/topology-non-knative.png[,900]
 
 ====
