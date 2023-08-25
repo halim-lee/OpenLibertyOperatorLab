@@ -444,7 +444,7 @@ image:images/revisions-new.png[,900]
 
 11. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit the traffic distribution. Click `Set traffic distribution` on the right side of `Revisions` and distribute traffic to both revisions by 50%.
 +
-image:images/traffic-distribution.png[,900]
+image:images/traffic-distribution.png[,500]
 
 12. Access the page through route again. The traffic can be routed to any of the two revisions by 50% chance. You can see that the running pod is assigned to the first revision below. The running pod may change to the latest revision from time to time because there is only 1 running pod and 50% will occupy the single pod.
 +
