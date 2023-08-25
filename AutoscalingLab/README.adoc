@@ -157,7 +157,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ]
 ----
 +
-This may take a long time, considering limited resources of the educational cluster. Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
 8. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
@@ -170,22 +170,20 @@ It will print output similar to the following:
 [source,log]
 ----
 NAME                                           READY   STATUS    RESTARTS   AGE
-pod/autoscaling-liberty-app-54946849f8-jl9lk   1/1     Running   0          10m
-pod/autoscaling-liberty-app-54946849f8-trnjk   1/1     Running   0          10m
-pod/autoscaling-liberty-app-54946849f8-xrkj6   1/1     Running   0          10m
+pod/autoscaling-liberty-app-569466fd7d-26n6h   1/1     Running   0          3m24s
+pod/autoscaling-liberty-app-569466fd7d-pfvlf   1/1     Running   0          103s
 
-NAME                              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-service/autoscaling-liberty-app   ClusterIP   172.30.110.7   <none>        9443/TCP   21m
+NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/autoscaling-liberty-app   ClusterIP   172.30.167.114   <none>        9443/TCP   3m29s
 
 NAME                                      READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/autoscaling-liberty-app   3/3     3            3           21m
+deployment.apps/autoscaling-liberty-app   2/2     2            2           3m24s
 
 NAME                                                 DESIRED   CURRENT   READY   AGE
-replicaset.apps/autoscaling-liberty-app-54946849f8   3         3         3       11m
-replicaset.apps/autoscaling-liberty-app-54c9d846bc   0         0         0       21m
+replicaset.apps/autoscaling-liberty-app-569466fd7d   2         2         2       3m24s
 
-NAME                                                          REFERENCE                            TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   2%/50%    3         5         3          11m
+NAME                                                          REFERENCE                            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   <unknown>/50%   2         3         2          119s
 ----
 
 9. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected.
