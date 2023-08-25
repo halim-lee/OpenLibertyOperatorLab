@@ -229,9 +229,9 @@ You should see `AbleToScale` and `ScalingActive` type reporting `True` with `Sca
 .*Method B: Deployment through OpenShift Web Console*
 [%collapsible]
 ====
-1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
+1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console. If you encounter Chrome warning and it does not let you proceed, you will have to type `thisisunsafe` and enter.
 
-2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assgined with for the lab.
+2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assigned with for the lab.
 +
 image:images/perspective.png[,300]
 
@@ -243,9 +243,26 @@ image:images/operator-backed.png[,500]
 +
 image:images/create-instance.png[,800]
 
-5. Change the OpenLibertyApplication instance to `autoscaling-liberty-app` under *Name* field. Set replicas to 1.
+5. Create OpenLibertyApplication instance through YAML view.
 +
-image:images/replicas.png[,500]
+[source,yaml]
+----
+apiVersion: apps.openliberty.io/v1
+kind: OpenLibertyApplication
+metadata:
+  name: autoscaling-liberty-app
+spec:
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  replicas: 1
+  expose: false
+  resources:
+    limits:
+      cpu: 10m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+----
 
 6. You will see that an instance is created in `Topology` tab. You can select a resource that you would like to investigate.
 +
