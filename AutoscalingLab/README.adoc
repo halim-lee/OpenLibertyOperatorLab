@@ -74,6 +74,13 @@ spec:
       periodSeconds: 5
       successThreshold: 1
       failureThreshold: 12
+  resources:
+    limits:
+      cpu: 15m
+      memory: 50Mi
+    requests:
+      cpu: 15m
+      memory: 50Mi
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
@@ -82,7 +89,7 @@ spec:
 ----
 oc apply -f liberty-autoscaling.yaml
 ----
-This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
+This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
 
 5. Check the status of the OpenLibertyApplication instance by running:
 +
@@ -97,18 +104,18 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ----
 [
   {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "lastTransitionTime": "2023-08-24T20:34:28Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "lastTransitionTime": "2023-08-24T20:35:30Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "lastTransitionTime": "2023-08-24T20:35:30Z",
     "message": "Deployment replicas ready: 1/1",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
@@ -125,20 +132,17 @@ As in the example output, `status` field shows the number of running replicas ou
 ----
 oc edit OpenLibertyApplication autoscaling-liberty-app
 ----
-Then remove `replicas: 1` and `resources: {}` under `spec` field and replace them with the following:
+Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
 [source,yaml]
 ----
-  resources:
-    requests:
-      cpu: "0.4"
   autoscaling:
-    maxReplicas: 5
-    minReplicas: 3
+    maxReplicas: 3
+    minReplicas: 2
     targetCPUUtilizationPercentage: 50
 ----
 +
-The `resources` field defines a metric source for targeted container resources. In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
+In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
 7. Check the status of the OpenLibertyApplication instance again by running:
 +
@@ -146,25 +150,25 @@ The `resources` field defines a metric source for targeted container resources. 
 ----
 oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
 ----
-It will print output similar to the following:
+It should print output that the application is `Reconciled`, `Ready` and `ResourcesReady` similar to the following:
 +
 [source,log]
 ----
 [
   {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "lastTransitionTime": "2023-08-24T20:46:34Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
+    "lastTransitionTime": "2023-08-24T20:47:34Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:45:16Z",
-    "message": "Deployment replicas ready: 3",
+    "lastTransitionTime": "2023-08-24T20:47:34Z",
+    "message": "Deployment replicas ready: 2",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
     "type": "ResourcesReady"
@@ -172,7 +176,7 @@ It will print output similar to the following:
 ]
 ----
 +
-Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+This may take a long time, considering limited resources of the educational cluster. Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
 8. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
