@@ -54,23 +54,16 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
-  resources:
-    limits:
-      cpu: 20m
-      memory: 64Mi
-    requests:
-      cpu: 20m
-      memory: 64Mi
   semeruCloudCompiler:
     enable: true
     replicas: 1
     resources:
       limits:
         cpu: 20m
-        memory: 128Mi
+        memory: 64Mi
       requests:
         cpu: 20m
-        memory: 128Mi
+        memory: 64Mi
   service:
     port: 9443
     type: ClusterIP
@@ -96,22 +89,22 @@ It will print output similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-05-11T18:21:19Z",
+    "lastTransitionTime": "2023-08-25T19:42:39Z",
+    "message": "Deployment replicas ready: 1/1",
+    "reason": "MinimumReplicasAvailable",
     "status": "True",
-    "type": "Reconciled"
+    "type": "ResourcesReady"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:21:30Z",
+    "lastTransitionTime": "2023-08-25T19:42:39Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-05-11T18:21:30Z",
-    "message": "Deployment replicas ready: 1/1",
-    "reason": "MinimumReplicasAvailable",
+    "lastTransitionTime": "2023-08-25T19:42:35Z",
     "status": "True",
-    "type": "ResourcesReady"
+    "type": "Reconciled"
   }
 ]
 ----
@@ -128,11 +121,11 @@ It will print output similar to the following:
 [source,log]
 ----
 {
-  "serviceHostname": "semeru-enabled-sample-semeru-compiler-1.open-liberty-lab.svc",
+  "serviceHostname": "semeru-enabled-sample-semeru-compiler-1.user2-namespace.svc",
   "tlsSecretName": "semeru-enabled-sample-semeru-compiler-1-tls-cm"
 }
 {
-  "saResourceVersion": "33776407",
+  "saResourceVersion": "166370768",
   "semeruGeneration": "1",
   "semeruInstancesCompleted": "1",
   "svcCertSecretName": "semeru-enabled-sample-svc-tls-cm"
@@ -150,41 +143,41 @@ It will print output similar to the following:
 +
 [source,log]
 ----
-NAME                                                 READY   STATUS    RESTARTS   AGE
-pod/semeru-enabled-sample-756fd76b8f-rwrw5                     1/1     Running   0          59m
-pod/semeru-enabled-sample-semeru-compiler-1-77c8d48749-7r9rx   1/1     Running   0          59m
+NAME                                                           READY   STATUS    RESTARTS   AGE
+pod/semeru-enabled-sample-787f6fd547-pmjsf                     1/1     Running   0          4m42s
+pod/semeru-enabled-sample-semeru-compiler-1-564bb567fd-9wpqr   1/1     Running   0          5m24s
 
-NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
-service/semeru-enabled-sample                  ClusterIP   172.30.91.109    <none>        9443/TCP    59m
-service/semeru-enabled-sample-semeru-compiler-1   ClusterIP   172.30.128.242   <none>        38400/TCP   59m
+NAME                                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+service/semeru-enabled-sample                     ClusterIP   172.30.246.239   <none>        9443/TCP    4m47s
+service/semeru-enabled-sample-semeru-compiler-1   ClusterIP   172.30.76.4      <none>        38400/TCP   6m10s
 
-NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/semeru-enabled-sample                     1/1     1            1           59m
-deployment.apps/semeru-enabled-sample-semeru-compiler-1   1/1     1            1           59m
+NAME                                                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/semeru-enabled-sample                     1/1     1            1           4m43s
+deployment.apps/semeru-enabled-sample-semeru-compiler-1   1/1     1            1           6m11s
 
-NAME                                                       DESIRED   CURRENT   READY   AGE
-replicaset.apps/semeru-enabled-sample-756fd76b8f                     1         1         1       59m
-replicaset.apps/semeru-enabled-sample-semeru-compiler-1-77c8d48749   1         1         1       59m
+NAME                                                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/semeru-enabled-sample-787f6fd547                     1         1         1       4m43s
+replicaset.apps/semeru-enabled-sample-semeru-compiler-1-564bb567fd   1         1         1       5m25s
 ----
 +
-The certificates are not reflected here, but you can check the certificates using `svcCertSecretName` and `tlsSecretName` in the status output above. These certificates are created and managed by the Cert Manager, which was covered before this lab. They are injected into the application as well as the JIT server via the secret by the operator.
+The certificates are not reflected here, but you can check the certificates using `svcCertSecretName` and `tlsSecretName` in the status output in Step 6. These certificates are created and managed by the Cert Manager, which was covered before this lab. They are injected into the application as well as the JIT server via the secret by the operator.
 
 8. Check the logs of JIT server pods. Use the pod name using the output above. For example, the pod name will start with `semeru-enabled-sample-semeru-compiler-1`...
 +
 [source,sh]
 ----
-oc logs semeru-enabled-sample-semeru-compiler-1-77c8d48749-7r9rx
+oc logs semeru-enabled-sample-semeru-compiler-1-564bb567fd-9wpqr
 ----
 +
 It will print output similar to the following:
 +
 [source,log]
 ----
-#INFO: StartTime: May 08 14:39:50 2023
-#INFO: TimeZone: UTC (UTC)
+#INFO:  StartTime: Aug 25 19:42:24 2023
+#INFO:  TimeZone: UTC (UTC)
 
 JITServer is ready to accept incoming requests
-#JITServer: t= 21496 A new client (clientUID=123456643212345) connected. Server allocated a new client session.
+#JITServer: t= 36700 A new client (clientUID=8010230079672077624) connected. Server allocated a new client session.
 ----
 +
 You can see that there are clients connected to the JITServer with unique client ID for each application pod.
@@ -193,18 +186,20 @@ You can see that there are clients connected to the JITServer with unique client
 +
 [source,sh]
 ----
-oc logs semeru-enabled-sample-756fd76b8f-rwrw5
+oc logs semeru-enabled-sample-787f6fd547-pmjsf    
 ----
 +
-It will print output similar to the following:
+It will print output similar to the following at the top:
 +
 [source,log]
-----
-...
-#INFO: StartTime: May 08 14:39:50 2023
-#INFO: Free Physical Memory: 2403 MB
-#INFO: CPU entitlement = 800.00
-#JITServer: t= 10 Connected to a server (serverUID=18345234542131213)
+---- 
+Found mounted TLS certificates, generating keystore
+Found mounted TLS CA certificate, adding to truststore
+
+#INFO:  StartTime: Aug 25 19:43:01 2023
+#INFO:  Free Physical Memory: 1008 MB 
+#INFO:  CPU entitlement = 100.00
+#JITServer: t=   247 Connected to a server (serverUID=12278687460026451856)
 ...
 ----
 +
@@ -219,16 +214,9 @@ oc edit OpenLibertyApplication/semeru-enabled-sample
 +
 [source,yaml]
 ----
-apiVersion: apps.openliberty.io/v1
-kind: OpenLibertyApplication
-metadata:
-  name: semeru-enabled-sample
-spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 2
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:e22dd56a05e44618a10d275d3ff07a38eb364c0f04f86ffe9618d83dd5467860
   semeruCloudCompiler:
-    enable: true
-    replicas: 1
+    replicas: 2
 ----
 
 11. Wait until the Liberty app deployment's pods are all updated to the new image.
@@ -302,33 +290,12 @@ The version check enables easy cleanup of the old version of JIT Server with the
 oc edit OpenLibertyApplication/semeru-enabled-sample
 ----
 +
-Then change `.spec.semeruCloudCompiler.enable` to false
+Then change `semeruCloudCompiler.enable` to false under `spec` field.
 +
 [source,yaml]
 ----
-apiVersion: apps.openliberty.io/v1
-kind: OpenLibertyApplication
-metadata:
-  name: semeru-enabled-sample
-spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 1
-  resources:
-    limits:
-      cpu: 10m
-      memory: 50Mi
-    requests:
-      cpu: 10m
-      memory: 50Mi
   semeruCloudCompiler:
     enable: false
-    resources:
-      limits:
-        cpu: 10m
-        memory: 50Mi
-      requests:
-        cpu: 10m
-        memory: 50Mi
 ----
 +
 You will be able to see that the pods of JIT Server are now removed.
@@ -377,24 +344,20 @@ metadata:
   name: semeru-enabled-sample
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 2
-  resources:
-    limits:
-      cpu: 10m
-      memory: 50Mi
-    requests:
-      cpu: 10m
-      memory: 50Mi
+  replicas: 1
   semeruCloudCompiler:
     enable: true
     replicas: 1
     resources:
       limits:
-        cpu: 10m
-        memory: 50Mi
+        cpu: 20m
+        memory: 64Mi
       requests:
-        cpu: 10m
-        memory: 50Mi
+        cpu: 20m
+        memory: 64Mi
+  service:
+    port: 9443
+    type: ClusterIP
 ----
 +
 This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
