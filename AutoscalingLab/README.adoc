@@ -58,10 +58,10 @@ spec:
   resources:
     limits:
       cpu: 10m
-      memory: 16Mi
+      memory: 32Mi
     requests:
       cpu: 10m
-      memory: 16Mi
+      memory: 32Mi
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
