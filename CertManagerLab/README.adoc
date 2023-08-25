@@ -59,25 +59,13 @@ spec:
   replicas: 1
   expose: true
   manageTLS: true
-  probes:
-    readiness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 1
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 24
-    liveness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 8
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 12
+  resources:
+    limits:
+      cpu: 10m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
