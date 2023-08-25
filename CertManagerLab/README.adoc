@@ -59,13 +59,6 @@ spec:
   replicas: 1
   expose: true
   manageTLS: true
-  resources:
-    limits:
-      cpu: 10m
-      memory: 32Mi
-    requests:
-      cpu: 10m
-      memory: 32Mi
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
