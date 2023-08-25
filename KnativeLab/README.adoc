@@ -104,21 +104,21 @@ It will print output similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-07-06T15:24:28Z",
+    "lastTransitionTime": "2023-08-25T16:49:02Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-07-06T15:24:28Z",
-    "message": "Application is reconciled and resources are ready.",
-    "status": "True",
-    "type": "Ready"
-  },
-  {
-    "lastTransitionTime": "2023-07-06T15:24:28Z",
+    "lastTransitionTime": "2023-08-25T16:49:01Z",
     "message": "Knative service is ready.",
     "status": "True",
     "type": "ResourcesReady"
+  },
+  {
+    "lastTransitionTime": "2023-08-25T16:49:02Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
   }
 ]
 ----
@@ -135,40 +135,56 @@ Then the output will be similar to the following:
 +
 [source,log]
 ----
-NAME                                                          READY   STATUS    RESTARTS   AGE
-pod/knative-enabled-sample-00001-deployment-d8676b4c4-dl8m8   2/2     Running   0          20s
+NAME                                                           READY   STATUS    RESTARTS   AGE
+pod/knative-enabled-sample-00001-deployment-7bff476879-4fdkh   2/2     Running   0          2m21s
 
-NAME                                           TYPE           CLUSTER-IP      EXTERNAL-IP                                                  PORT(S)                                              AGE
-service/knative-enabled-sample                 ExternalName   <none>          kourier-internal.knative-serving-ingress.svc.cluster.local   80/TCP                                               4s
-service/knative-enabled-sample-00001           ClusterIP      172.30.138.3    <none>                                                       80/TCP,443/TCP                                       20s
-service/knative-enabled-sample-00001-private   ClusterIP      172.30.43.116   <none>                                                       80/TCP,443/TCP,9090/TCP,9091/TCP,8022/TCP,8012/TCP   20s
+NAME                                           TYPE           CLUSTER-IP       EXTERNAL-IP                                                  PORT(S)                                              AGE
+service/knative-enabled-sample                 ExternalName   <none>           kourier-internal.knative-serving-ingress.svc.cluster.local   80/TCP                                               5s
+service/knative-enabled-sample-00001           ClusterIP      172.30.169.174   <none>                                                       80/TCP,443/TCP                                       2m21s
+service/knative-enabled-sample-00001-private   ClusterIP      172.30.105.77    <none>                                                       80/TCP,443/TCP,9090/TCP,9091/TCP,8022/TCP,8012/TCP   2m21s
 
 NAME                                                      READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/knative-enabled-sample-00001-deployment   1/1     1            1           20s
+deployment.apps/knative-enabled-sample-00001-deployment   1/1     1            1           2m22s
 
-NAME                                                                DESIRED   CURRENT   READY   AGE
-replicaset.apps/knative-enabled-sample-00001-deployment-d8676b4c4   1         1         1       20s
+NAME                                                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/knative-enabled-sample-00001-deployment-7bff476879   1         1         1       2m22s
+
+NAME                                                 URL                                                                                         LATESTCREATED                  LATESTREADY                    READY   REASON
+service.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-user2-namespace.apps.was-education-cluster.cp.fyre.ibm.com   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
+
+NAME                                                       LATESTCREATED                  LATESTREADY                    READY   REASON
+configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
 
 NAME                                                        CONFIG NAME              K8S SERVICE NAME   GENERATION   READY   REASON   ACTUAL REPLICAS   DESIRED REPLICAS
 revision.serving.knative.dev/knative-enabled-sample-00001   knative-enabled-sample                      1            True             1                 1
 
-NAME                                               URL                                                                         READY   REASON
-route.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com   True    
-
-NAME                                                 URL                                                                         LATESTCREATED                  LATESTREADY                    READY   REASON
-service.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
-
-NAME                                                       LATESTCREATED                  LATESTREADY                    READY   REASON
-configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
+NAME                                               URL                                                                                         READY   REASON
+route.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-user2-namespace.apps.was-education-cluster.cp.fyre.ibm.com   True 
 ----
 +
-It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application. Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero.
+It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application.
+Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero. Then the pod will not be included in the output. When traffic is observed, the pod will be scaled back up.
 
-8. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
+8. Let's take a closer look at the Knative service instance. Run below to get the revision details:
 +
 [source,sh]
 ----
-oc get route.serving.knative.dev/knative-enabled-sample 
+oc get rev -n $NAMESPACE
+----
++
+[source,log]
+----
+NAME                           CONFIG NAME              K8S SERVICE NAME   GENERATION   READY   REASON   ACTUAL REPLICAS   DESIRED REPLICAS
+knative-enabled-sample-00001   knative-enabled-sample                      1            True             0                 0
+----
++
+You will see that the revision's generation is 1. This captures point-in-time snapshot of the Knative service. Notice that the actual and desired replicas in the output may be 0's. This is an example of Knative service's scale-to-zero feature when the pod is idle.
+
+9. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
++
+[source,sh]
+----
+oc get route.serving.knative.dev/knative-enabled-sample -n $NAMESPACE
 ----
 +
 [source,log]
@@ -180,8 +196,23 @@ knative-enabled-sample   https://knative-enabled-sample-liberty-lab.apps.operato
 Access the page, and you will be able to see the sample Liberty app page.
 +
 image:images/sample-app-page.png[,700]
++
+When the page is accessed, pod will be scaled up from 0.
++
+[source,sh]
+----
+oc get rev -n $NAMESPACE
+----
++
+[source,log]
+----
+NAME                           CONFIG NAME              K8S SERVICE NAME   GENERATION   READY   REASON   ACTUAL REPLICAS   DESIRED REPLICAS
+knative-enabled-sample-00001   knative-enabled-sample                      1            True             1                 1
+----
++
+The actual replicas and desired replicas are scaled up to 1 from 0.
 
-9. Edit OpenLibertyApplication to disable Knative configuration. Change `createKnativeService` field to false.
+10. Edit OpenLibertyApplication to update application image. Edit `applicationImage` field under `spec` field:
 +
 [source,sh]
 ----
@@ -190,21 +221,77 @@ oc edit OpenLibertyApplication knative-enabled-sample
 +
 [source,yaml]
 ----
-apiVersion: apps.openliberty.io/v1
-kind: OpenLibertyApplication
-metadata:
-  name: knative-enabled-sample
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
-  replicas: 1
-  createKnativeService: false
-  expose: true
-  service:
-    port: 9080
-    type: ClusterIP
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started:latest
 ----
 
-10. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
+11. Access the sample app on brower again to update the pod. Then run the command:
++
+[source,sh]
+----
+oc get rev -n $NAMESPACE
+----
++
+[source,log]
+----
+NAME                           CONFIG NAME              K8S SERVICE NAME   GENERATION   READY   REASON   ACTUAL REPLICAS   DESIRED REPLICAS
+knative-enabled-sample-00001   knative-enabled-sample                      1            True             0                 0
+knative-enabled-sample-00002   knative-enabled-sample                      2            True             1                 1
+----
++
+You can now see 2 revision outputs. Notice `knative-enabled-sample-00002` instance's generation value is 2 and the replicas are running under that revision.
+
+12. You can rollback to the previous revision, separate traffic to both revisions and also rollout to the latest revision. Edit Knative service to use both revisions.
++
+[source,sh]
+----
+oc edit ksvc knative-enabled-sample -n $NAMESPACE
+----
++
+Edit `traffic` field under `spec` field:
++
+[source,log]
+----
+  traffic:
+    - latestRevision: false
+      percent: 50
+      revisionName: knative-enabled-sample-00001
+    - latestRevision: false
+      percent: 50
+      revisionName: knative-enabled-sample-00002
+----
++
+This will route 50% of traffic to the first revision and the other half to the latest revision.
+
+13. Check the revision status.
++
+[source,sh]
+----
+oc get rev -n $NAMESPACE
+----
++
+[source,log]
+----
+NAME                           CONFIG NAME              K8S SERVICE NAME   GENERATION   READY   REASON   ACTUAL REPLICAS   DESIRED REPLICAS
+knative-enabled-sample-00001   knative-enabled-sample                      1            True             1                 1
+knative-enabled-sample-00002   knative-enabled-sample                      2            True             0                 1
+----
++
+You can see that the running pod is assigned to the first revision. The running pod may change to the latest revision from time to time because there is only 1 running pod and 50% will occupy the single pod.
+
+14. Edit OpenLibertyApplication to disable Knative configuration. Change `createKnativeService` field under `spec` field to false:
++
+[source,sh]
+----
+oc edit OpenLibertyApplication knative-enabled-sample
+----
++
+[source,yaml]
+----
+  createKnativeService: false
+----
+
+14. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
 +
 [source,sh]
 ----
@@ -216,22 +303,22 @@ Then the output will be similar to the following:
 [source,log]
 ----
 NAME                                          READY   STATUS    RESTARTS   AGE
-pod/knative-enabled-sample-7b4cc69d49-6nwc4   1/1     Running   0          36s
+pod/knative-enabled-sample-555fbf4c99-fmh6r   1/1     Running   0          27s
 
-NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-service/knative-enabled-sample   ClusterIP   172.30.85.152   <none>        9080/TCP   36s
+NAME                             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/knative-enabled-sample   ClusterIP   172.30.141.167   <none>        9080/TCP   33s
 
 NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/knative-enabled-sample   1/1     1            1           36s
+deployment.apps/knative-enabled-sample   1/1     1            1           28s
 
 NAME                                                DESIRED   CURRENT   READY   AGE
-replicaset.apps/knative-enabled-sample-7b4cc69d49   1         1         1       36s
+replicaset.apps/knative-enabled-sample-555fbf4c99   1         1         1       28s
 
-NAME                                              HOST/PORT                                                              PATH   SERVICES                 PORT       TERMINATION   WILDCARD
-route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-open-liberty-lab.apps.wsatest.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
+NAME                                              HOST/PORT                                                                           PATH   SERVICES                 PORT       TERMINATION   WILDCARD
+route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-user2-namespace.apps.was-education-cluster.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
 ----
 
-11. Check the status of the OpenLibertyApplication instance by running:
+15. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -244,22 +331,22 @@ Then the output will be similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-07-20T05:16:03Z",
+    "lastTransitionTime": "2023-08-25T17:29:19Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-07-20T05:16:05Z",
-    "message": "Application is reconciled and resources are ready.",
-    "status": "True",
-    "type": "Ready"
-  },
-  {
-    "lastTransitionTime": "2023-07-20T05:16:05Z",
+    "lastTransitionTime": "2023-08-25T17:29:22Z",
     "message": "Deployment replicas ready: 1/1",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
     "type": "ResourcesReady"
+  },
+  {
+    "lastTransitionTime": "2023-08-25T17:29:22Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
   }
 ]
 ----
