@@ -276,7 +276,7 @@ image:images/ola.png[,900]
 +
 At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
 +
-image:images/status-conditions.png[,900]
+image:images/status.png[,900]
 
 8. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `autoscaling-liberty-app` instance again. Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` field under `spec` field as the following:
 +
@@ -290,7 +290,13 @@ image:images/status-conditions.png[,900]
 +
 In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-9. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
+9. If you would like to see the instance’s new status, click Search tab on the left and search for OpenLibertyApplications resource. Select `autoscaling-liberty-app`.
++
+image:images/status-new.png[,900]
++
+Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+
+10. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
 +
 image:images/topology-new.png[,900]
 +
