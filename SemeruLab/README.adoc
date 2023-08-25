@@ -236,24 +236,24 @@ oc get all -l app.kubernetes.io/part-of=semeru-enabled-sample
 +
 [source,log]
 ----
-NAME                                                 READY   STATUS    RESTARTS   AGE
-pod/semeru-enabled-sample-756fd76b8f-rwrw5                     1/1     Running   0          59m
-pod/semeru-enabled-sample-semeru-compiler-2-494jdp493-39dj9   1/1     Running   0          59m
+NAME                                                           READY   STATUS    RESTARTS   AGE
+pod/semeru-enabled-sample-57fb6c58fb-8cfjb                     1/1     Running   0          2m33s
+pod/semeru-enabled-sample-semeru-compiler-2-5f6f6fd555-lpz8d   1/1     Running   0          7m30s
 
-NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
-service/semeru-enabled-sample                  ClusterIP   172.30.91.109    <none>        9443/TCP    59m
-service/semeru-enabled-sample-semeru-compiler-2   ClusterIP   172.30.128.242   <none>        38400/TCP   59m
+NAME                                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
+service/semeru-enabled-sample                     ClusterIP   172.30.165.56   <none>        9443/TCP    8m50s
+service/semeru-enabled-sample-semeru-compiler-2   ClusterIP   172.30.57.208   <none>        38400/TCP   7m36s
 
-NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/semeru-enabled-sample                     1/1     1            1           59m
-deployment.apps/semeru-enabled-sample-semeru-compiler-2   1/1     1            1           59m
+NAME                                                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/semeru-enabled-sample                     1/1     1            1           8m45s
+deployment.apps/semeru-enabled-sample-semeru-compiler-2   1/1     1            1           7m31s
 
-NAME                                                       DESIRED   CURRENT   READY   AGE
-replicaset.apps/semeru-enabled-sample-756fd76b8f                     1         1         1       59m
-replicaset.apps/semeru-enabled-sample-semeru-compiler-2-494jdp493   1         1         1       59m
+NAME                                                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/semeru-enabled-sample-57fb6c58fb                     1         1         1       5m18s
+replicaset.apps/semeru-enabled-sample-semeru-compiler-2-5f6f6fd555   1         1         1       7m31s
 ----
 +
-You can see that the JIT Server's deployment name has been changed from `semeru-enabled-sample-semeru-compiler-1` to `semeru-enabled-sample-semeru-compiler-2`. This is a new set of JIT Server sessions with the Liberty app. You can check the log and ensure 4 connections are established.
+You can see that the JIT Server's deployment name has been changed from `semeru-enabled-sample-semeru-compiler-1` to `semeru-enabled-sample-semeru-compiler-2`. This is a new set of JIT Server sessions with the Liberty app.
 +
 [source,sh]
 ----
@@ -271,11 +271,11 @@ It will print output similar to the following:
 [source,log]
 ----
 {
-  "serviceHostname": "semeru-enabled-sample-semeru-compiler-1.open-liberty-lab.svc",
-  "tlsSecretName": "semeru-enabled-sample-semeru-compiler-1-tls-cm"
+  "serviceHostname": "semeru-enabled-sample-semeru-compiler-2.user2-namespace.svc",
+  "tlsSecretName": "semeru-enabled-sample-semeru-compiler-2-tls-cm"
 }
 {
-  "saResourceVersion": "33776407",
+  "saResourceVersion": "166384339",
   "semeruGeneration": "2",
   "semeruInstancesCompleted": "2",
   "svcCertSecretName": "semeru-enabled-sample-svc-tls-cm"
@@ -298,22 +298,39 @@ Then change `semeruCloudCompiler.enable` to false under `spec` field.
   semeruCloudCompiler:
     enable: false
 ----
+
+15. Check the instance's status sections.
 +
-You will be able to see that the pods of JIT Server are now removed.
+[source,sh]
+----
+oc get OpenLibertyApplication semeru-enabled-sample -ojson | jq '.status.semeruCompiler'
+----
+It will print output similar to the following:
 +
 [source,log]
 ----
-NAME                                                 READY   STATUS    RESTARTS   AGE
-pod/semeru-enabled-sample-756fd76b8f-rwrw5                     1/1     Running   0          59m
+null
+----
+Note that the output of `.status.semeruCompiler` returns null. You will be able to see that the pods of JIT Server are now removed as well.
++
+[source,sh]
+----
+oc get all -l app.kubernetes.io/part-of=semeru-enabled-sample
+----
++
+[source,log]
+----
+NAME                                         READY   STATUS    RESTARTS   AGE
+pod/semeru-enabled-sample-7cc885d77f-lnpgr   1/1     Running   0          63s
 
-NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
-service/semeru-enabled-sample                  ClusterIP   172.30.91.109    <none>        9443/TCP    59m
+NAME                            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/semeru-enabled-sample   ClusterIP   172.30.165.56   <none>        9443/TCP   11m
 
-NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/semeru-enabled-sample                     1/1     1            1           59m
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/semeru-enabled-sample   1/1     1            1           11m
 
-NAME                                                       DESIRED   CURRENT   READY   AGE
-replicaset.apps/semeru-enabled-sample-756fd76b8f                     1         1         1       59m
+NAME                                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/semeru-enabled-sample-7cc885d77f   1         1         1       64s
 ----
 ====
 
