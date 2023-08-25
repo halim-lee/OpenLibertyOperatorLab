@@ -395,17 +395,17 @@ image:images/ola.png[,500]
 +
 Select `Details` tab and scroll to the bottom of the page to see the status conditions. 
 +
-image:images/status.png[,700]
+image:images/status.png[,900]
 +
 As in the example image, `ResourcesReady` type shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, move to the next step. If the `status` reports that the Application is not ready, check the pod's log.
 
-8. Click `YAML` tab and scroll to the bottom to see semeru related properties in the status section as well.
+7. Click `YAML` tab and scroll to the bottom to see semeru related properties in the status section as well.
 +
-image:images/status-conditions-semeru.png[,900]
+image:images/status-conditions-semeru.png[,700]
 +
 It lists the service host name and associated TLS secret name under `.status.semeruCompiler` section. It also shows Semeru's generation and completed number under `.status.references`.
 
-9. Check the logs of JIT server pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-1`.
+8. Check the logs of JIT server pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-1`.
 +
 image:images/semeru-deployment.png[,900]
 +
@@ -419,7 +419,7 @@ image:images/semeru-logs.png[,900]
 +
 You can see that there are clients connected to the JITServer with unique client ID for each application pod.
 
-10. Check the logs of Liberty application pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample`.
+9. Check the logs of Liberty application pods. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance. Click on Deployment resource with name `semeru-enabled-sample`.
 +
 image:images/app-deployment.png[,900]
 +
@@ -433,7 +433,7 @@ image:images/app-logs.png[,900]
 +
 You can see that the Liberty application is successfully connected to JIT Server pod.
 
-11. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Click 3 dots beside `OLA semeru-enabled-sample`, then `Edit OpenLibertyApplication`.
+10. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Click 3 dots beside `OLA semeru-enabled-sample`, then `Edit OpenLibertyApplication`.
 +
 image:images/ola.png[,500]
 +
@@ -444,7 +444,7 @@ Modify `applicationImage` field under `spec` field to another image.
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:e22dd56a05e44618a10d275d3ff07a38eb364c0f04f86ffe9618d83dd5467860
 ----
 
-12. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance.
+11. Go back to `Topology` tab to see managed resources of OpenLibertyApplication instance.
 +
 image:images/deployment-loading.png[,700]
 +
@@ -454,7 +454,7 @@ image:images/topology-new.png[,700]
 +
 You can see that the JIT Server’s deployment name has been changed from semeru-enabled-sample-semeru-compiler-1 to semeru-enabled-sample-semeru-compiler-2. This is a new set of JIT Server sessions with the Liberty app.
 
-13. Check the logs of JIT server pods to ensure 4 connections are established. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-2`. Click `Pods` tab and the pod's name. Then click `Logs` tab. You should be able to see JITServer logs reporting that the server allocated 4 new client sessions, instead of 3.
+13. Check the logs of JIT server pods to ensure a connection is established on the new semeru pod. Click on Deployment resource with name `semeru-enabled-sample-semeru-compiler-2`. Click `Pods` tab and the pod's name. Then click `Logs` tab.
 +
 image:images/semeru-logs-new.png[,900]
 
@@ -466,7 +466,7 @@ The version check enables easy cleanup of the old version of JIT Server with the
 
 15. To disable JIT Server integration, make changes to the OpenLibertyApplication instance. 
 +
-Change `.spec.semeruCloudCompiler.enable` to false:
+Change `semeruCloudCompiler.enable` field to false under `spec` field:
 +
 [source,yaml]
 ----
