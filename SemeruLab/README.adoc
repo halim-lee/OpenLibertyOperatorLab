@@ -359,6 +359,9 @@ spec:
   service:
     port: 9443
     type: ClusterIP
+  deployment:
+    updateStrategy:
+      type: Recreate
 ----
 +
 This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
