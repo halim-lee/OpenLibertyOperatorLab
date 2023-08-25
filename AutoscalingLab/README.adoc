@@ -300,7 +300,7 @@ In this example, it  `autoscaling` field configures the range of number of Pods 
 +
 image:images/status-new.png[,900]
 +
-Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If any type under `Conditions` section reports that the Application is not ready, check the pod's log.
 
 10. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
 +
