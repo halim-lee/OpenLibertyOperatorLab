@@ -408,7 +408,7 @@ It shows Deployment and its associated Pods, Services, Route and Knative resourc
 +
 image:images/revisions.png[,900]
 
-6. Check the OpenLibertyApplication instance's status. Click 3 dots beside `OLA knative-enabled-sample`, then `Edit OpenLibertyApplication`.
+7. Check the OpenLibertyApplication instance's status. Click 3 dots beside `OLA knative-enabled-sample`, then `Edit OpenLibertyApplication`.
 +
 image:images/ola.png[,500]
 +
@@ -418,7 +418,7 @@ image:images/status.png[,900]
 +
 As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-7. Get the URL allocated by `Routes` resource. Navigate to `Topology` section and click `KSVC knative-enabled-sample` below the icon. You can locate it under `Routes` section on the right. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
+8. Get the URL allocated by `Routes` resource. Navigate to `Topology` section and click `KSVC knative-enabled-sample` below the icon. You can locate it under `Routes` section on the right. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
 +
 image:images/route.png[,900]
 +
@@ -426,7 +426,7 @@ Access the page, and you will be able to see the sample Liberty app page with Op
 +
 image:images/sample-app-page.png[,700]
 
-8. Edit OpenLibertyApplication to update application image. Edit `applicationImage` field under `spec` field:
+9. Edit OpenLibertyApplication to update application image. Edit `applicationImage` field under `spec` field:
 +
 [source,yaml]
 ----
@@ -434,24 +434,24 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started:latest
 ----
 
-9. Access the page through route again, and you will now be able to see the sample Liberty app page with Open Liberty 23.0.0.7.
+10. Access the page through route again, and you will now be able to see the sample Liberty app page with Open Liberty 23.0.0.7.
 +
 image:images/sample-app-page-new.png[,700]
 
-10. You will see that there are 2 revisions and the latest revision `knative-enabled-sample-00002` has 100% written on the right side. This captures point-in-time snapshot of the Knative service. 100% of the traffic is routed to the latest revision. Note that the replicas may be 0’s by idle pod.
+11. You will see that there are 2 revisions and the latest revision `knative-enabled-sample-00002` has 100% written on the right side. This captures point-in-time snapshot of the Knative service. 100% of the traffic is routed to the latest revision. Note that the replicas may be 0’s by idle pod.
 +
 image:images/revisions-new.png[,900]
 
-11. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit the traffic distribution. Click `Set traffic distribution` on the right side of `Revisions` and distribute traffic to both revisions by 50%.
+12. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit the traffic distribution. Click `Set traffic distribution` on the right side of `Revisions` and distribute traffic to both revisions by 50%.
 +
 image:images/traffic-distribution.png[,500]
 
-12. Access the page through route again. The traffic can be routed to any of the two revisions by 50% chance. You can see that the running pod is assigned to the first revision below. The running pod may change to the latest revision from time to time because there is only 1 running pod and 50% will occupy the single pod.
+13. Access the page through route again. The traffic can be routed to any of the two revisions by 50% chance. You can see that the running pod is assigned to the first revision below. The running pod may change to the latest revision from time to time because there is only 1 running pod and 50% will occupy the single pod.
 +
 image:images/topology-new.png[,900]
 +
 
-13. Edit the OpenLibertyApplication instance to disable Knative configuration. Change `createKnativeService` field to false under `spec` field: 
+14. Edit the OpenLibertyApplication instance to disable Knative configuration. Change `createKnativeService` field to false under `spec` field: 
 +
 Change `createKnativeService: true` under `spec` field to `createKnativeService: false`:
 +
@@ -462,7 +462,7 @@ Change `createKnativeService: true` under `spec` field to `createKnativeService:
 +
 The operator will delete Knative related resources and create new resources for the application.
 
-14. Select `Details` tab and scroll down to see the status conditions.
+15. Select `Details` tab and scroll down to see the status conditions.
 +
 image:images/status-new.png[,900]
 +
