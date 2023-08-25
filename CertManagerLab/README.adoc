@@ -216,28 +216,40 @@ data:
 +
 Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues certifiactes for the service by using the provided CA.
 
-10. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create a YAML file called `cert-issuer.yaml` with the following content:
+10. Set the application instance to grab custom secret for the application. 
++
+[source,sh]
+----
+oc edit OpenLibertyApplication certificate-liberty-app
+----
+Then add `route` field under `spec` field as the following:
 +
 [source,yaml]
 ----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: olo-custom-issuer
-spec:
-  vault:
-    auth:
-      tokenSecretRef:
-        key: token
-        name: vault-token
-    path: pki/sign/cert-manager
-    server: >-
-      https://vault-internal.vault.svc:8201
+  route:
+    certificateSecretRef: olo-custom-ca-tls
 ----
 +
-Note that the issuer's name is `olo-custom-issuer`. This way, the operator knows that a custom issuer exists.
 
-11. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
+11. Visit external route of the application.
++
+[source,sh]
+----
+oc get routes -n $NAMESPACE
+----
+Then you will get similar output as the following:
++
+[source,yaml]
+----
+NAME                      HOST/PORT                                                                            PATH   SERVICES                  PORT       TERMINATION   WILDCARD
+certificate-liberty-app   certificate-liberty-app-user2-namespace.apps.was-education-cluster.cp.fyre.ibm.com          certificate-liberty-app   9443-tcp   reencrypt     None
+----
++
+Visit the host and check the certificate of the page. The Common Name will be chaged to "ibm.com", which is specified in the custom TLS secret.
++
+image:images/cert-page.png[,900]
+
+12. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
 +
 [source,sh]
 ----
