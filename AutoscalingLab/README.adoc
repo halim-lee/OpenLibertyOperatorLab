@@ -199,30 +199,30 @@ It will print output similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-07-20T05:38:32Z",
+    "lastTransitionTime": "2023-08-25T13:15:38Z",
     "message": "recommended size matches current size",
     "reason": "ReadyForNewScale",
     "status": "True",
     "type": "AbleToScale"
   },
   {
-    "lastTransitionTime": "2023-07-20T05:43:17Z",
+    "lastTransitionTime": "2023-08-25T13:19:09Z",
     "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
     "reason": "ValidMetricFound",
     "status": "True",
     "type": "ScalingActive"
   },
   {
-    "lastTransitionTime": "2023-07-20T05:43:17Z",
-    "message": "the desired replica count is less than the minimum replica count",
-    "reason": "TooFewReplicas",
-    "status": "True",
+    "lastTransitionTime": "2023-08-25T13:19:09Z",
+    "message": "the desired count is within the acceptable range",
+    "reason": "DesiredWithinRange",
+    "status": "False",
     "type": "ScalingLimited"
   }
 ]
 ----
 +
-You should see `AbleToScale` condition type reporting `True` and `ScalingActive` condition type reporting `True` as well. Status reporting `TooFewReplicas` is not to be concerned for this lab. The sample Liberty application is using very little CPU resource and HPA is complaining that `minReplica` as 3 is too many.
+You should see `AbleToScale` and `ScalingActive` type reporting `True` with `ScalingLimited` type reporting `False`. These report that the workload is being scaled with desired resource utilization.
 
 ====
 
