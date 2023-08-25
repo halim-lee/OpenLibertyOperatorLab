@@ -278,7 +278,7 @@ At the bottom, you will see *Status Conditions* section, which gives you detail 
 +
 image:images/status-conditions.png[,900]
 
-8. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `autoscaling-liberty-app` instance again. Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` and `resources` field under `spec` field as the following:
+8. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `autoscaling-liberty-app` instance again. Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` field under `spec` field as the following:
 +
 [source,yaml]
 ----
