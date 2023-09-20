@@ -59,17 +59,24 @@ spec:
     replicas: 1
     resources:
       limits:
-        cpu: 20m
-        memory: 64Mi
+        cpu: 200m
+        memory: 256Mi
       requests:
-        cpu: 20m
-        memory: 64Mi
+        cpu: 100m
+        memory: 128Mi
   service:
     port: 9443
     type: ClusterIP
   deployment:
     updateStrategy:
       type: Recreate
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
 ----
 
 4. Create the OpenLibertyApplication instance using the command:
@@ -208,7 +215,7 @@ Found mounted TLS CA certificate, adding to truststore
 +
 You can see that the Liberty application is successfully connected to JIT Server pod.
 
-10. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Modify `applicationImage` field under `spec` field to another image.
+10. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image.
 +
 [source,sh]
 ----
@@ -217,6 +224,7 @@ oc edit OpenLibertyApplication/semeru-enabled-sample
 +
 [source,yaml]
 ----
+  replicas: 2
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:e22dd56a05e44618a10d275d3ff07a38eb364c0f04f86ffe9618d83dd5467860
 ----
 
@@ -368,17 +376,24 @@ spec:
     replicas: 1
     resources:
       limits:
-        cpu: 20m
-        memory: 64Mi
+        cpu: 200m
+        memory: 256Mi
       requests:
-        cpu: 20m
-        memory: 64Mi
+        cpu: 100m
+        memory: 128Mi
   service:
     port: 9443
     type: ClusterIP
   deployment:
     updateStrategy:
       type: Recreate
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
 ----
 +
 This will create a Deployment and Service named `semeru-enabled-sample-semeru-compiler-1` for semeru compiler first. After the service is fully ready, the operator will create a Deployment and Service named `semeru-enabled-sample` for the application.
@@ -437,10 +452,11 @@ You can see that the Liberty application is successfully connected to JIT Server
 +
 image:images/ola.png[,500]
 +
-Modify `applicationImage` field under `spec` field to another image.
+Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image.
 +
 [source,yaml]
 ----
+  replicas: 2
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:e22dd56a05e44618a10d275d3ff07a38eb364c0f04f86ffe9618d83dd5467860
 ----
 
