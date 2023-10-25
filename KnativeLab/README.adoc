@@ -222,7 +222,7 @@ oc edit OpenLibertyApplication knative-enabled-sample -n $NAMESPACE
 [source,yaml]
 ----
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started:latest
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:f7c7da21059eef8734cf0d43a417609aecf68bfe89d0be8e61012fade5877a01
 ----
 +
 Wait until the application pod is ready. You can check if the pod is ready through running the following:
@@ -232,7 +232,7 @@ Wait until the application pod is ready. You can check if the pod is ready throu
 oc get pods -l app.kubernetes.io/part-of=knative-enabled-sample -n $NAMESPACE
 ----
 
-11. Access the sample app on browser again to update the pod. You will see that the version is updated to newer Open Liberty from 23.0.0.3.
+11. Access the sample app on browser again to update the pod. You will see that the version is updated to Open Liberty 23.0.0.8 from 23.0.0.3.
 +
 image:images/sample-app-page-new.png[,800]
 +
@@ -422,14 +422,14 @@ Edit `applicationImage` field under `spec` field:
 [source,yaml]
 ----
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started:latest
+  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:f7c7da21059eef8734cf0d43a417609aecf68bfe89d0be8e61012fade5877a01
 ----
 
 9. When you go back to topology page, you will now see 2 revisions and 2 pods in the list. The updated application image information is held in the second revision. This enables point-in-time snapshot of the Knative service, so that all revisions are stored and accessible when needed.
 +
 image:images/topology-updated.png[,800]
 
-10. Access the sample app on browser again to update the pod. You will see that the version is updated to newer Open Liberty from 23.0.0.3.
+10. Access the sample app on browser again to update the pod. You will see that the version is updated to Open Liberty 23.0.0.8 from 23.0.0.3.
 +
 image:images/sample-app-page-new.png[,800]
 
