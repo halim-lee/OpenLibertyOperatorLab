@@ -14,8 +14,8 @@ This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLiber
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-[%collapsible]
-====
+// [%collapsible]
+// ====
 1. Make sure you have `oc` client installed in your system and are logged into a RedHat OpenShift cluster before you begin the lab.
 +
 [source,sh]
@@ -224,11 +224,11 @@ It will print output similar to the following:
 +
 You should see `AbleToScale` and `ScalingActive` type reporting `True` with `ScalingLimited` type reporting `False`. These report that the workload is being scaled with desired resource utilization.
 
-====
+// ====
 
 .*Method B: Deployment through OpenShift Web Console*
-[%collapsible]
-====
+// [%collapsible]
+// ====
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console. If you encounter Chrome warning and it does not let you proceed, you will have to type `thisisunsafe` and enter.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assigned with for the lab.
@@ -310,5 +310,4 @@ When you click on the HPA resource and scroll down to see the status condition, 
 +
 image:images/hpa-status-conditions.png[,900]
 
-====
-
+// ====

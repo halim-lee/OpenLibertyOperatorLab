@@ -16,8 +16,8 @@ There are three methods to generate and configure certificates with Open Liberty
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-[%collapsible]
-====
+// [%collapsible]
+// ====
 1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
 +
 [source,sh]
@@ -272,11 +272,11 @@ The operator will no longer manage the certificates. Manual configuration is req
 oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions'
 ----
 
-====
+// ====
 
 .*Method B: Deployment through OpenShift Web Console*
-[%collapsible]
-====
+// [%collapsible]
+// ====
 
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
 
@@ -409,4 +409,4 @@ Change `manageTLS: true` under `spec` field to `manageTLS: false`:
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
 13. Check the status of the OpenLibertyApplication instance again.
-====
+// ====

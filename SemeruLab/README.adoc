@@ -14,8 +14,8 @@ The `Semeru Cloud Compiler` efficiently manages Just-In-Time (JIT) compilation r
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-[%collapsible]
-====
+// [%collapsible]
+// ====
 1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
 +
 [source,sh]
@@ -340,11 +340,11 @@ deployment.apps/semeru-enabled-sample   1/1     1            1           11m
 NAME                                               DESIRED   CURRENT   READY   AGE
 replicaset.apps/semeru-enabled-sample-7cc885d77f   1         1         1       64s
 ----
-====
+// ====
 
 .*Method B: Deployment through OpenShift Web Console*
-[%collapsible]
-====
+// [%collapsible]
+// ====
 
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
 
@@ -496,5 +496,4 @@ image:images/topology-no-semeru.png[,900]
 +
 You will be able to see that the pods of JIT Server are now removed.
 
-====
-
+// ====

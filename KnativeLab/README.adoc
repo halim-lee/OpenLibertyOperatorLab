@@ -8,17 +8,23 @@ endif::[]
 This lab focuses on the configuration of Knative Serving for OpenLibertyApplication instances. Before proceeding with this lab, it is advisable to complete the AutoscalingLab.
 
 == Knative Serving
-`Knative Serving` simplifies the deployment of serverless applications by abstracting away infrastructure complexities. With serverless computing, users can deploy their applications without the burden of managing the underlying servers. The platform dynamically allocates machine resources as per demand, alleviating users from the worries of capacity planning, configuration, maintenance, and container scaling are abstracted away.
+`Knative Serving` simplifies the deployment of serverless applications by abstracting away infrastructure complexities. With serverless computing, users can deploy their applications without the burden of managing the underlying servers. The platform dynamically allocates machine resources as per demand, alleviating users from the worries of capacity planning, configuration, maintenance, and container scaling.
 
 One of the key benefits of Knative Serving is its automatic scaling feature, which efficiently adjusts resource allocation based on workload demands. It also provides robust routing and network programming capabilities, enabling intelligent traffic distribution. Additionally, it provides support for point-in-time snapshots, allowing users to capture and manage previous versions of deployed code and configurations. This provides a safety net for seamless rollbacks and helps testing and version control for better application stability.
 
-== Configuration Options
+== Getting Started
+* Using educational cluster? If you need access to the cluster, please contact Lab Administrators to have credentials assigned to you.
+* Using your own cluster? Please follow link:++../Prerequisites.adoc++[Prerequisites guide] before proceeding.
+
+== Deployment Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
 // [%collapsible]
 // ====
-1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
+1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
+
+2. Log into a RedHat OpenShift cluster.
 +
 [source,sh]
 ----
@@ -29,7 +35,7 @@ For example:
 +
 [source,sh]
 ----
-oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+oc login --server=https://9.123.456.789:6443 --username=testuser --password=PasswordExample123
 ----
 +
 If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
@@ -150,7 +156,7 @@ NAME                                                                DESIRED   CU
 replicaset.apps/knative-enabled-sample-00001-deployment-5c999bf49   1         1         1       2m33s
 
 NAME                                               URL                                                                                    READY   REASON
-route.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-test-namespace.apps.liberty-operators.cp.fyre.ibm.com   True    
+route.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-test-namespace.apps.liberty-operator.cp.fyre.ibm.com   True    
 
 NAME                                                       LATESTCREATED                  LATESTREADY                    READY   REASON
 configuration.serving.knative.dev/knative-enabled-sample   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
@@ -159,7 +165,7 @@ NAME                                                        CONFIG NAME         
 revision.serving.knative.dev/knative-enabled-sample-00001   knative-enabled-sample                      1            True             1                 1
 
 NAME                                                 URL                                                                                    LATESTCREATED                  LATESTREADY                    READY   REASON
-service.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-test-namespace.apps.liberty-operators.cp.fyre.ibm.com   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
+service.serving.knative.dev/knative-enabled-sample   https://knative-enabled-sample-test-namespace.apps.liberty-operator.cp.fyre.ibm.com   knative-enabled-sample-00001   knative-enabled-sample-00001   True    
 ----
 +
 It shows Deployment and its associated Pods, Services, Route and Knative resources created by the operator. Two containers are running for the Pod: one for Liberty application and one for Queue proxy, which is a sidecar container serving as a reverse proxy in front of the Liberty application.
@@ -176,7 +182,7 @@ oc get route.serving.knative.dev/knative-enabled-sample -n $NAMESPACE
 [source,log]
 ----
 NAME                     URL                                                                                    READY   REASON
-knative-enabled-sample   https://knative-enabled-sample-test-namespace.apps.liberty-operators.cp.fyre.ibm.com   True    
+knative-enabled-sample   https://knative-enabled-sample-test-namespace.apps.liberty-operator.cp.fyre.ibm.com   True    
 ----
 +
 Access the page, and you will be able to see the sample Liberty app page with Open Liberty 23.0.0.3. You may experience some delays if Knative scaled the pod to zero to recreate and rerun the service.
@@ -301,7 +307,7 @@ NAME                                                DESIRED   CURRENT   READY   
 replicaset.apps/knative-enabled-sample-74b65ddd9f   1         1         1       10s
 
 NAME                                              HOST/PORT                                                                      PATH   SERVICES                 PORT       TERMINATION   WILDCARD
-route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-test-namespace.apps.liberty-operators.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
+route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-test-namespace.apps.liberty-operator.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
 ----
 
 16. Check the status of the OpenLibertyApplication instance by running:
@@ -346,7 +352,7 @@ Now the OpenLibertyApplication instance is reporting that the application is hos
 // [%collapsible]
 // ====
 
-1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
+1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.apps.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assigned with for the lab.
 +
@@ -394,7 +400,7 @@ It shows Knative service's Pod, Revision and Route created by the operator. Two 
 +
 image:images/revisions.png[,900]
 
-7. Get the URL allocated by `Routes` resource. You can locate it under `Routes` section on the right. For example: `https://knative-enabled-sample-user1-namespace.apps.was-education-cluster.cp.fyre.ibm.com`.
+7. Get the URL allocated by `Routes` resource. You can locate it under `Routes` section on the right. For example: `https://knative-enabled-sample-test-namespace.apps.was-education-cluster.cp.fyre.ibm.com`.
 +
 image:images/route.png[,900]
 +
