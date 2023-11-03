@@ -10,13 +10,19 @@ This lab focuses on the configuration of Horizontal Pod Autoscaler for OpenLiber
 == Horizontal Pod Autoscaler (HPA)
 `Horizontal Pod Autoscaler (HPA)` is a feature that automates the scaling of workloads such as Deployments or StatefulSets, based on the configured demand for their resources, typically measured by CPU and memory consumption. It dynamically adjusts the number of Pods to efficiently handle the workload's resource requirements. When the workload is under-utilized and the number of running Pods is above the minimum configured value, HPA reduces the number of Pods. Conversely, when the workload is over-utilized and the number of running Pods is below the maximum configured value, HPA increases the number of Pods. By automatically scaling the number of Pods based on demand, HPA enables efficient resource utilization and eliminates the need for manual intervention in scaling decision.
 
-== Configuration Options
+== Getting Started
+* Using educational cluster? If you need access to the cluster, please contact Lab Administrators to have credentials assigned to you.
+* Using your own cluster? Please follow link:++../Prerequisites.adoc++[Prerequisites guide] before proceeding.
+
+== Deployment Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-// [%collapsible]
-// ====
-1. Make sure you have `oc` client installed in your system and are logged into a RedHat OpenShift cluster before you begin the lab.
+[%collapsible]
+====
+1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
+
+2. Log into a RedHat OpenShift cluster.
 +
 [source,sh]
 ----
@@ -27,12 +33,12 @@ For example:
 +
 [source,sh]
 ----
-oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+oc login --server=https://9.123.456.789:6443 --username=testuser --password=PasswordExample123
 ----
 +
 If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
-2. To set your current namespace to be the namespace you will be working in, run the following commands:
+3. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -42,8 +48,7 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 
-
-3. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
+4. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -55,24 +60,17 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
   expose: false
-  resources:
-    limits:
-      cpu: 10m
-      memory: 32Mi
-    requests:
-      cpu: 10m
-      memory: 32Mi
 ----
 
-4. Create the OpenLibertyApplication instance using the command:
+5. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
 oc apply -f liberty-autoscaling.yaml
 ----
-This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
+This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
 
-5. Check the status of the OpenLibertyApplication instance by running:
+6. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -85,18 +83,18 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ----
 [
   {
-    "lastTransitionTime": "2023-08-24T20:34:28Z",
+    "lastTransitionTime": "2023-11-03T13:33:55Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-08-24T20:35:30Z",
+    "lastTransitionTime": "2023-11-03T13:33:57Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-08-24T20:35:30Z",
+    "lastTransitionTime": "2023-11-03T13:33:57Z",
     "message": "Deployment replicas ready: 1/1",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
@@ -105,9 +103,9 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ]
 ----
 +
-As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+As in the example output, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log, by running `oc logs <pod_name>`. You can get the pod name through `oc get pods -n $NAMESPACE`.
 
-6. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
+7. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
 +
 [source,sh]
 ----
@@ -117,6 +115,7 @@ Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
 [source,yaml]
 ----
+spec:
   autoscaling:
     maxReplicas: 3
     minReplicas: 2
@@ -125,7 +124,7 @@ Then remove `replicas: 1` under `spec` field and replace it with the following:
 +
 In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-7. Check the status of the OpenLibertyApplication instance again by running:
+8. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
@@ -137,18 +136,18 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ----
 [
   {
-    "lastTransitionTime": "2023-08-24T20:46:34Z",
+    "lastTransitionTime": "2023-11-03T13:37:24Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-08-24T20:47:34Z",
+    "lastTransitionTime": "2023-11-03T13:37:27Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-08-24T20:47:34Z",
+    "lastTransitionTime": "2023-11-03T13:37:27Z",
     "message": "Deployment replicas ready: 2",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
@@ -159,7 +158,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 +
 Compared to the last status output, `status` field now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `Ready` when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
-8. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
+9. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
 [source,sh]
 ----
@@ -170,23 +169,23 @@ It will print output similar to the following:
 [source,log]
 ----
 NAME                                           READY   STATUS    RESTARTS   AGE
-pod/autoscaling-liberty-app-569466fd7d-26n6h   1/1     Running   0          3m24s
-pod/autoscaling-liberty-app-569466fd7d-pfvlf   1/1     Running   0          103s
+pod/autoscaling-liberty-app-6c6b7f4f7f-g6vqj   1/1     Running   0          4m20s
+pod/autoscaling-liberty-app-6c6b7f4f7f-wg7m5   1/1     Running   0          51s
 
-NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
-service/autoscaling-liberty-app   ClusterIP   172.30.167.114   <none>        9443/TCP   3m29s
+NAME                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/autoscaling-liberty-app   ClusterIP   172.30.14.142   <none>        9443/TCP   4m22s
 
 NAME                                      READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/autoscaling-liberty-app   2/2     2            2           3m24s
+deployment.apps/autoscaling-liberty-app   2/2     2            2           4m21s
 
 NAME                                                 DESIRED   CURRENT   READY   AGE
-replicaset.apps/autoscaling-liberty-app-569466fd7d   2         2         2       3m24s
+replicaset.apps/autoscaling-liberty-app-6c6b7f4f7f   2         2         2       4m21s
 
 NAME                                                          REFERENCE                            TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   <unknown>/50%   2         3         2          119s
+horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   <unknown>/50%   2         3         2          67s
 ----
 
-9. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected.
+10. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait for the resource to be ready.
 +
 [source,sh]
 ----
@@ -199,21 +198,21 @@ It will print output similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-08-25T13:15:38Z",
+    "lastTransitionTime": "2023-11-03T13:37:24Z",
     "message": "recommended size matches current size",
     "reason": "ReadyForNewScale",
     "status": "True",
     "type": "AbleToScale"
   },
   {
-    "lastTransitionTime": "2023-08-25T13:19:09Z",
+    "lastTransitionTime": "2023-11-03T13:39:09Z",
     "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
     "reason": "ValidMetricFound",
     "status": "True",
     "type": "ScalingActive"
   },
   {
-    "lastTransitionTime": "2023-08-25T13:19:09Z",
+    "lastTransitionTime": "2023-11-03T13:39:09Z",
     "message": "the desired count is within the acceptable range",
     "reason": "DesiredWithinRange",
     "status": "False",
@@ -222,14 +221,64 @@ It will print output similar to the following:
 ]
 ----
 +
-You should see `AbleToScale` and `ScalingActive` type reporting `True` with `ScalingLimited` type reporting `False`. These report that the workload is being scaled with desired resource utilization.
+You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum replica count. That is okay for this lab, since it is reporting there can be only 1 replica running. These report that the workload is being scaled with desired resource utilization.
 
-// ====
+11. Edit the OpenLibertyApplication instance to disable autoscaling feature by setting `.spec.autoscaling` field empty. Run the command:
++
+[source,sh]
+----
+oc edit OpenLibertyApplication autoscaling-liberty-app
+----
++
+Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
++
+[source,yaml]
+----
+spec:
+...
+  autoscaling:
+
+----
+
+12. Check the status of the OpenLibertyApplication instance again by running:
++
+[source,sh]
+----
+oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.conditions'
+----
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-11-03T13:37:24Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-11-03T13:46:59Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-11-03T13:46:59Z",
+    "message": "Deployment replicas ready: 1/1",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+----
++
+As in the example output, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
+
+====
 
 .*Method B: Deployment through OpenShift Web Console*
-// [%collapsible]
-// ====
-1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console. If you encounter Chrome warning and it does not let you proceed, you will have to type `thisisunsafe` and enter.
+[%collapsible]
+====
+1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.apps. If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assigned with for the lab.
 +
@@ -255,39 +304,27 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
   expose: false
-  resources:
-    limits:
-      cpu: 10m
-      memory: 32Mi
-    requests:
-      cpu: 10m
-      memory: 32Mi
 ----
 +
 This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
 
-6. You will see that an instance is created in `Topology` tab. Click `OLA autoscaling-liberty-app` to see its resources. You can select a resource that you would like to investigate.
+6. You will see that an instance is created in `Topology` page. Click `OLA autoscaling-liberty-app` to see its resources. You can select a resource that you would like to investigate.
 +
 image:images/topology.png[,900]
 
-7. Check the instance’s status. Click Search tab on the left and search for OpenLibertyApplications resource. Select `autoscaling-liberty-app`.
+7. If you would like to see the instance's status at once, click 3 dots beside `OLA autoscaling-liberty-app`, then `Edit OpenLibertyApplication`.
 +
-image:images/ola.png[,900]
-+
-At the bottom, you will see *Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
-+
-image:images/status.png[,900]
-+
-As in the example, `ResourcesReady` type shows the number of running replicas out of configured number of replicas. If it reports that the application deployment is not ready, check the pod's log.
+image:images/ola.png[,500]
 
-8. To edit, go back to the top of the page and click YAML tab below the instance name.
+8. Scroll to the botton of the YAML file. As in the example, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 +
-image:images/edit-yaml.png[,500]
-+
-Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` field under `spec` field as the following:
+image:images/status.png[,700]
+
+9. Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` field under `spec` field as the following:
 +
 [source,yaml]
 ----
+spec:
   autoscaling:
     maxReplicas: 3
     minReplicas: 2
@@ -296,18 +333,34 @@ Edit the OpenLibertyApplication instance to use autoscaling feature by configuri
 +
 In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-9. Check the instance’s status again. Click Search tab on the left and search for OpenLibertyApplications resource. Select `autoscaling-liberty-app`.
+10. Check the instance’s status again.
 +
-image:images/status-new.png[,900]
+image:images/status-new.png[,700]
 +
 Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report the instance as `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If any type under `Conditions` section reports that the Application is not ready, check the pod's log.
 
-10. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
+11. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
 +
 image:images/topology-new.png[,900]
 +
-When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` and `ScalingActive` type reporting `True` with `ScalingLimited` type reporting `False`. These report that the workload is being scaled with desired resource utilization.
+When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum replica count. That is okay for this lab, since it is reporting there can be only 1 replica running. These report that the workload is being scaled with desired resource utilization.
 +
 image:images/hpa-status-conditions.png[,900]
 
-// ====
+12. Edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
++
+[source,yaml]
+----
+spec:
+...
+  autoscaling:
+
+----
+
+13. Check the status of the OpenLibertyApplication instance again at the bottom.
++
+image:images/status-no-hpa.png[,700]
++
+As in the example, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
+
+====
