@@ -12,13 +12,19 @@ In Kubernetes-based clusters, administartors have the ability to configure TLS c
 
 There are three methods to generate and configure certificates with Open Liberty Operator. The lab will provide a step-by-step walk-through of each approach. However, before starting the lab, ensure that the certificate manager is already installed on the OpenShift cluster. In case it is not installed, please reach out to the Lab Administrators for assistance with the installation process.
 
-== Configuration Options
+== Getting Started
+* Using educational cluster? If you need access to the cluster, please contact Lab Administrators to have credentials assigned to you.
+* Using your own cluster? Please follow link:++../Prerequisites.adoc++[Prerequisites guide] before proceeding.
+
+== Deployment Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
 // [%collapsible]
 // ====
-1. Make sure you have `oc` client and `jq` installed in your system, and are logged into a RedHat OpenShift cluster before you begin the lab.
+1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
+
+2. Log into a RedHat OpenShift cluster.
 +
 [source,sh]
 ----
@@ -29,13 +35,13 @@ For example:
 +
 [source,sh]
 ----
-oc login --server=https://9.123.456.789:6443 --username=user1 --password=PasswordExample123
+oc login --server=https://9.123.456.789:6443 --username=testuser --password=PasswordExample123
 ----
 +
 If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
 
-2. To set your current namespace to be the namespace you will be working in, run the following commands:
+3. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -45,8 +51,7 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 
-
-3. Create a YAML file called `liberty-certificate.yaml` with the following content:
+4. Create a YAML file called `liberty-certificate.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -59,28 +64,9 @@ spec:
   replicas: 1
   expose: true
   manageTLS: true
-  probes:
-    readiness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 1
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 24
-    liveness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 8
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 12
 ----
 
-4. Create the OpenLibertyApplication instance using the command:
+5. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -89,11 +75,11 @@ oc apply -f liberty-certificate.yaml
 +
 This will create a Deployment named `certificate-liberty-app` with 1 replica. By setting `.spec.manageTLS` field to true, the operator attempts to generate certificates and mount them to the pod at `/etc/x509/certs`. Port `9443` is used as the default service port. Since `.spec.expose` field is set to true, the Route is also configured automatically to enable TLS by using `reencrypt` termination.
 
-5. Check the status of the OpenLibertyApplication instance by running:
+6. Check the status of the OpenLibertyApplication instance and its service certificate secret name by running:
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions, .status.references'
 ----
 +
 It will print output similar to the following:
@@ -102,29 +88,86 @@ It will print output similar to the following:
 ----
 [
   {
-    "lastTransitionTime": "2023-08-25T14:09:00Z",
+    "lastTransitionTime": "2023-11-03T02:34:53Z",
     "status": "True",
     "type": "Reconciled"
   },
   {
-    "lastTransitionTime": "2023-08-25T14:09:27Z",
+    "lastTransitionTime": "2023-11-03T02:34:55Z",
     "message": "Application is reconciled and resources are ready.",
     "status": "True",
     "type": "Ready"
   },
   {
-    "lastTransitionTime": "2023-08-25T14:09:27Z",
+    "lastTransitionTime": "2023-11-03T02:34:55Z",
     "message": "Deployment replicas ready: 1/1",
     "reason": "MinimumReplicasAvailable",
     "status": "True",
     "type": "ResourcesReady"
   }
 ]
+{
+  "saResourceVersion": "27557235",
+  "semeruGeneration": "1",
+  "svcCertSecretName": "certificate-liberty-app-svc-tls-cm"
+}
 ----
 +
-As in the example output, `status` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+As in the example output, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log. `svcCertSecretName` field shows the generated certificate secret name that the application uses.
 
-6. Verify that a Certificate Authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
+7. Get the application pod name by running:
++
+[source,sh]
+----
+oc get pods -n $NAMESPACE
+----
++
+[source,log]
+----
+NAME                                       READY   STATUS    RESTARTS   AGE
+certificate-liberty-app-78f8796974-4qjr8   1/1     Running   0          96s
+----
++
+Use the pod name from the output, run another command to get Open Liberty logs:
++
+[source,sh]
+----
+oc logs <pod_name>
+----
++
+Wait for the `CWWKF0011I` log to make sure the Liberty server started successfully:
++
+[source,log]
+----
+{"type":"liberty_message","host":"certificate-liberty-app-78f8796974-4qjr8","ibm_userDir":"\/opt\/ol\/wlp\/usr\/","ibm_serverName":"defaultServer","message":"CWWKF0011I: The defaultServer server is ready to run a smarter planet. The defaultServer server started in 85.906 seconds.","ibm_threadId":"00000028","ibm_datetime":"2023-11-03T01:48:35.446+0000","ibm_messageId":"CWWKF0011I","module":"com.ibm.ws.kernel.feature.internal.FeatureManager","loglevel":"AUDIT","ibm_sequence":"1698976115446_0000000000021","ext_thread":"Default Executor-thread-3"}
+----
+
+8. Get the URL allocated by the application instance. For example: `https://certificate-liberty-app-test-namespace.apps.was-education-cluster.cp.fyre.ibm.com`.
++
+[source,sh]
+----
+oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.endpoints'
+----
++
+[source,log]
+----
+[
+  {
+    "name": "Ingress",
+    "scope": "External",
+    "type": "Application",
+    "uri": "https://certificate-liberty-app-test-namespace.apps.was-education-cluster.cp.fyre.ibm.com"
+  }
+]
+----
++
+Copy and paste the uri value on your browser to access the application's external route.
+
+9. Check the certificate of the page. It will say `Not Secure` because the certificate is self-signed. You should see that the certificate is issued to *.apps.<OCP-cluster-name>.cp.fyre.ibm.com and issued by ingress-operator. These are the default values when a certificate is not specified.
++
+image:images/default-certificate.png[,900]
+
+10. Verify that a Certificate Authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace.
 +
 [source,sh]
 ----
@@ -156,18 +199,42 @@ certificate-liberty-app-svc-tls-cm    kubernetes.io/tls   3      6m36s
 olo-ca-tls                            kubernetes.io/tls   3      21d
 ----
 +
-This shows the default secret generated by the Certificate Manager, with `svc-tls-cm` suffix appended to the OpenLibertyApplication instance's name.
+This shows the default secret generated by the Cert Manager, with `svc-tls-cm` suffix appended to the OpenLibertyApplication instance's name.
 
-7. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
+11. Edit OpenLibertyApplication to add the certificate secret reference to the route. Add `route` field under `spec` field.
++
+[source,sh]
+----
+oc edit OpenLibertyApplication certificate-liberty-app -n $NAMESPACE
+----
++
+[source,yaml]
+----
+spec:
+...
+  route:
+   certificateSecretRef: certificate-liberty-app-svc-tls-cm
+----
+
+12. Revisit the application page on your browser. Check the certificate again. Now the certificate is issued to `certificate-liberty-app.test-namespace.svc` and issued by `Open Liberty Operator`. This is the default self-signed certificate that the Open Liberty Operator provides with Cert Manager.
++
+image:images/default-route-certificate.png[,900]
+
+13. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
 +
 [source,sh]
 ----
 oc edit OpenLibertyApplication certificate-liberty-app
 ----
-Then edit `service` field under `spec` field as the following:
+Then edit `service` and `route` field under `spec` field as the following:
 +
 [source,yaml]
 ----
+spec:
+...
+  route:
+   certificateSecretRef: certificate-liberty-app-svc-tls-ocp
+...
   service:
     annotations:
       service.beta.openshift.io/serving-cert-secret-name: certificate-liberty-app-svc-tls-ocp
@@ -175,9 +242,9 @@ Then edit `service` field under `spec` field as the following:
     type: ClusterIP
 ----
 +
-This configuration adds annotation to use Red Had OpenShift CA. It will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file.
+This configuration adds annotation to use Red Had OpenShift CA. It will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file. By updating the `certificateSecretRef` field, the application route will load the new certificate.
 
-8. Run the following to see if the secret is successfully created:
+14. Run the following to see if the secret is successfully created:
 +
 [source,sh]
 ----
@@ -195,9 +262,13 @@ olo-ca-tls                            kubernetes.io/tls   3      21d
 
 ----
 +
-Compared to the last TLS secrets output, there is a secret with `svc-tls-ocp` suffix appended to the OpenLibertyApplication instance's name.
+Compared to the last TLS secrets output, there is another secret with `svc-tls-ocp` suffix appended to the OpenLibertyApplication instance's name.
 
-9. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
+15. Revisit the application page on your browser. Check the certificate again. The certificate is still issued to `certificate-liberty-app.test-namespace.svc` but is now issued by `openshift-service-serving-signer`.
++
+image:images/ocp-route-certificate.png[,900]
+
+16. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a YAML file called `cert-secret.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -214,42 +285,29 @@ data:
   tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBekpZVVc5MjBPY20rK0NUcDZ5L29GdGpkSDB2SC9Oa0FjQnRWS2NlaTdhSnZxZVZiCk1ja2FFenM0eUF5eisvTkh2WlJFZEgwVFFsQ1d0U09vVERXWGNEaDlvYjk0dnNlTklNZzltZ05KYy9uc05ROFIKUmhNYzBmVWpNSUo3TTdiTC82bkx2VG84WVhqYmczekd5Tk1pa3lXc3krdkp1UVNyQ2ZvZWNsR3F6c3FRd2dDbworaTZtUW5VdXFhQjJkNlpnZWdaS0dPRUlZVEdGV3BacmR0dCt0RzNWakMzRVJlMW1weDYrWmZVSDJWeDI1eEpaCnBpYVZ6R0JWd0VCdEJuczBIT1VuVWpKRnhmS1JNL0N2VDJzcDVUVkFUNnp1ZFM3cnB5VVdUck92QUFuQTNPdlQKS3Z2b1VKZG1ubUNpZFdyN010Z2dTd1ZmcTBHMTNvU1RWRXBaVVFJREFRQUJBb0lCQUYyRjBlSzQ4N1ZqRTJpTwpQMXlpOXI3Uy9pcGJVeDJ6K1c1R0lHVkwvS0FUSEdhWEVWd3Q2VHlYV3ZxZ1MvckdHS3FDUjlUVWhHUlJRTU9uCmZEenlWcnNYSjk4MER6ZHZNNFdqNC8wdXVYcEo2bi9LMW9PcEl3aWJ2aTFqeUh3NGVRTHpsTTU0KzdjM0wybnAKTlZvQ29wQ1ByWEUrNVdVdHpCNXdkMUNkSXE4S3UxTHJsbGczbXJEUEQ3RXg4Q0hoeG5KQTlLOGRJUGpzQ2tJSApUK0M1QTJWWGpzYjNSK3IxQ0p5UHg0bitQbDhqNnNWVkgyQzFSMzRwb0I0R1hvdURIemxWZUM1WXV2eTU3OEVLCnRuUHg4TXhqc0d6aFJaSkhKbHZmOStGbVpiSThMcHBQdFBzRkVPMnkyczZtWCtUQ1hmMXl3aWVUODdjSWtMdnUKQ2F3WG1uMENnWUVBNitkdVNkOWJoUG1LYTZma1d0MjVqc1JEdStWcW5aSHpySTRRQUtnV3MzVzVEYmpEQUF3aApFS25jYm1WSmRCZEJXSHJUVWI1NEJ6bWN1enAwcGMvRWZkZXVybFp0NVBVMnV1aHZFY24zVjhHOFc0cXM2NXJWCjg4cWQ5K0NEb25VdllpcTVEOGIyZ3RzVnZDRXltU1dKMjNod2dsTFNZNjY4cHBzWlZvZWlUYjhDZ1lFQTNnT3MKalJpQVBGT0dCVFBxRFRJbnZpWjA2b0R1Nk9IWURxSEUvajQydE5xZWJRRkhFekpkVEJKdUk1WnNaR3Bqa0cvUgpwZzY2R1hvcnAyQ1liU1JMSkI4Q3VtZllYTE9KUE91MFJrTTNlRG1pUXZreUVGLytiOW1yeFVCa2dZa0lzWnpYCmQwSEtFOG10UGIvWXNWVFpzU0d5OGRwZ1M4ZWtEZXJrLzY4MVBPOENnWUIvWW5nMm9jcnNza2Rodk1aZG5zODkKWFpQcDJZZEowTzlSSldGVXlXK0F0cmdYeGNaZXR5My9yb21lZjBrN3kvYjRUVkxoR0VYK09NaitmU0ZTRERCaApkOThXdXdzYWtLTmVLSGNabHdMZU8zcDN3Qm1DSEJrZVRUSWlFUFZqKzMxN3QvQTRxY3FoZktadThVbytVbnZ2CnJFaXN4d1plMTVOOUw5RnQzVTN5UndLQmdEN0lZVEpoWEZveThISm1OT2pZWng3QnQweGRlN0pGczVpbnJKS04KTzJFM2RaZXp4Y3FxOG5GQndQMjFXeCttYWxOOUc1ZFBFTmVGa2ZTNlAwQ1dBOTNLR3pabGlXemxwSWlpeXc4WAprUWNoblQ0OVJDZ1hUVmVLQWFZOVNHN05OclVyZWs4U1ByZ0x6ejdvRXJwTEdXaWE5QVNxMFpKOGVXc3FJdW9mClBQbm5Bb0dCQUxjVlRUZnkrTHBxbFlPbzdXSHIzNDBrTXlteWYvMmxTZGtmK0FDTm5lck04Z2RaZzB1Mm43NHIKTmI2ZkdiNXF5eHhOVkI3c3NVMFg2QVVONzdoQ3JWVUlVNmxWaURNRFNzbWNQdzBPU1hneUFPVnJZTTVIUU5BMApvMEVYZDBlV3JrU1V3cDFBRGR2b252eEh1czFlRG12OEk1b2RHRklOaFBtODgzcmdodFVKCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
 ----
 +
-Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues certifiactes for the service by using the provided CA.
+Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues a certificate for the service by using the provided CA.
 
-10. Set the application instance to grab custom secret for the application. 
+17. Edit OpenLibertyApplication to update certificate reference for the route.
 +
 [source,sh]
 ----
 oc edit OpenLibertyApplication certificate-liberty-app
 ----
-Then add `route` field under `spec` field as the following:
+Then edit `service` and `route` field under `spec` field as the following:
 +
 [source,yaml]
 ----
+spec:
+...
   route:
     certificateSecretRef: olo-custom-ca-tls
 ----
-+
 
-11. Visit external route of the application.
+18. Revisit the application page on your browser. Check the certificate again. The certificate is now issued to `ibm.com` and issued by `ibm.com`.
 +
-[source,sh]
-----
-oc get routes -n $NAMESPACE
-----
-Then you will get similar output as the following:
-+
-[source,yaml]
-----
-NAME                      HOST/PORT                                                                            PATH   SERVICES                  PORT       TERMINATION   WILDCARD
-certificate-liberty-app   certificate-liberty-app-user2-namespace.apps.was-education-cluster.cp.fyre.ibm.com          certificate-liberty-app   9443-tcp   reencrypt     None
-----
-+
-Visit the host and check the certificate of the page. The Common Name will be chaged to "ibm.com", which is specified in the custom TLS secret.
-+
-image:images/cert-page.png[,900]
+image:images/custom-certificate.png[,900]
 
-12. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
+19. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. Run the command: 
 +
 [source,sh]
 ----
@@ -260,17 +318,49 @@ Then change `manageTLS: true` under `spec` field to `manageTLS: false`:
 +
 [source,yaml]
 ----
+spec:
+...
   manageTLS: false
 ----
 +
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
-12. Check the status of the OpenLibertyApplication instance again by running:
+20. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
-oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions'
+oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.conditions, .status.references'
 ----
++
+[source,log]
+----
+[
+  {
+    "lastTransitionTime": "2023-11-03T02:34:53Z",
+    "status": "True",
+    "type": "Reconciled"
+  },
+  {
+    "lastTransitionTime": "2023-11-03T02:38:23Z",
+    "message": "Application is reconciled and resources are ready.",
+    "status": "True",
+    "type": "Ready"
+  },
+  {
+    "lastTransitionTime": "2023-11-03T02:38:23Z",
+    "message": "Deployment replicas ready: 1/1",
+    "reason": "MinimumReplicasAvailable",
+    "status": "True",
+    "type": "ResourcesReady"
+  }
+]
+{
+  "saResourceVersion": "27557235",
+  "semeruGeneration": "1"
+}
+----
++
+As in the example output, the application should be ready even without TLS configuration. Without TLS management, `svcCertSecretName` field should now be gone.
 
 // ====
 
@@ -301,29 +391,10 @@ kind: OpenLibertyApplication
 metadata:
   name: certificate-liberty-app
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
+  applicationImage: icr.io/appcafe/open-liberty:full-java8-openj9-ubi
   replicas: 1
   expose: true
   manageTLS: true
-  probes:
-    readiness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 1
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 24
-    liveness:
-      httpGet:
-        path: /
-        port: 9080
-      initialDelaySeconds: 8
-      timeoutSeconds: 1
-      periodSeconds: 5
-      successThreshold: 1
-      failureThreshold: 12
 ----
 +
 This will create a Deployment named `certificate-liberty-app` with 1 replica. By setting `.spec.manageTLS` field to true, the operator attempts to generate certificates and mount them to the pod at `/etc/x509/certs`. Port `9443` is used as the default service port. Since `.spec.expose` field is set to true, the Route is also configured automatically to enable TLS by using `reencrypt` termination.
@@ -332,32 +403,78 @@ This will create a Deployment named `certificate-liberty-app` with 1 replica. By
 +
 image:images/topology.png[,900]
 
-6. If you would like to see the instance's status at once, click `Search` tab on the left and search for `OpenLibertyApplications` resource.
+6. If you would like to see the instance's status at once, click 3 dots beside `OLA certificate-liberty-app`, then `Edit OpenLibertyApplication`.
 +
-image:images/ola.png[,900]
+image:images/ol-edit.png[,500]
 
-7. Select `certificate-liberty-app` instance. At the bottom, you will see *Status Conditions* section, which gives you detail on status conditions of the managed resources and the application instance.
+7. Scroll to the botton of the YAML file. As in the example, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log. `svcCertSecretName` field shows the generated certificate secret name that the application uses.
 +
 image:images/status-conditions.png[,900]
 
-8. Verify that a Certificate Authority (CA) `Issuer` instance and a corresponding secret are successfully created in your namespace. Click `Secrets` tab on the left and search for `Secret` with name containing "certificate".
+8. Go back to the Topology page. Check application pod's log to make sure Liberty server successfully started.
 +
-image:images/cert-secrets.png[,900]
+image:images/topology-logs.png[,900]
++
+Wait for the `CWWKF0011I` log to make sure the Liberty server started successfully:
++
+[source,log]
+----
+{"type":"liberty_message","host":"certificate-liberty-app-78f8796974-4qjr8","ibm_userDir":"\/opt\/ol\/wlp\/usr\/","ibm_serverName":"defaultServer","message":"CWWKF0011I: The defaultServer server is ready to run a smarter planet. The defaultServer server started in 85.906 seconds.","ibm_threadId":"00000028","ibm_datetime":"2023-11-03T01:48:35.446+0000","ibm_messageId":"CWWKF0011I","module":"com.ibm.ws.kernel.feature.internal.FeatureManager","loglevel":"AUDIT","ibm_sequence":"1698976115446_0000000000021","ext_thread":"Default Executor-thread-3"}
+----
 
-9. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `certificate-liberty-app` instance again. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `service` field under `spec` field as the following:
+9. Go back to Topology page. Access the application's external route.
++
+image:images/topology-route.png[,900]
+
+10. Check the certificate of the page. It will say `Not Secure` because the certificate is self-signed. You should see that the certificate is issued to *.apps.<OCP-cluster-name>.cp.fyre.ibm.com and issued by ingress-operator. These are the default values when a certificate is not specified.
++
+image:images/default-certificate.png[,900]
+
+11. Verify that a Certificate Authority (CA) `Issuer` instance and its corresponding secret are successfully created in your namespace. Click `Search` tab on the left and search for resources `Secret` and `Issuer`. For `Secret`, filter type to TLS. Then you should see the following.
++
+image:images/search-secret.png[,900] 
++
+image:images/issuers.png[,700] 
++
+This shows the default secret generated by the Cert Manager, with `svc-tls-cm` suffix appended to the OpenLibertyApplication instance's name.
+
+12. Go back to Topology page. Edit OpenLibertyApplication to add the certificate secret reference to the route. Add `route` field under `spec` field.
 +
 [source,yaml]
 ----
+spec:
+...
+  route:
+   certificateSecretRef: certificate-liberty-app-svc-tls-cm
+----
+
+13. Revisit the application page on your browser. Check the certificate again. Now the certificate is issued to `certificate-liberty-app.test-namespace.svc` and issued by `Open Liberty Operator`. This is the default self-signed certificate that the Open Liberty Operator provides with Cert Manager.
++
+image:images/default-route-certificate.png[,900]
+
+14. Since the operator is running on OpenShift Container Platform for the lab, we can also explore Red Hat OpenShift service CA as well. This method is the default for the operator and is the simplest way to generate certificates without the help of Certificate Manager. Edit the OpenLibertyApplication instance to force use of the Red Hat OpenShift service CA by configuring `.spec.service` field: 
++
+[source,yaml]
+----
+spec:
+...
+  route:
+   certificateSecretRef: certificate-liberty-app-svc-tls-ocp
+...
   service:
     annotations:
-      service.beta.openshift.io/serving-cert-secret-name: my-app-svc-tls-ocp
+      service.beta.openshift.io/serving-cert-secret-name: certificate-liberty-app-svc-tls-ocp
     port: 9443
     type: ClusterIP
 ----
 +
-This configuration will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file.
+This configuration adds annotation to use Red Had OpenShift CA. It will ensure `tls.crt` and `tls.key` files are mounted to the pod and Red Hat OpenShift CA certificate is in the /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt file. By updating the `certificateSecretRef` field, the application route will load the new certificate.
 
-10. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a secret by clicking `Secrets`, `Create` and `From YAML`. Create a secret with the following content:
+15. Try searching for the TLS secrets again. Compared to the last TLS secrets output, there is another secret with `svc-tls-ocp` suffix appended to the OpenLibertyApplication instance's name.
++
+image:images/search-secret-new.png[,700]
+
+16. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a secret by clicking `Secrets`, `Create` and `From YAML`. Create a secret with the following content:
 +
 [source,yaml]
 ----
@@ -374,39 +491,36 @@ data:
   tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBekpZVVc5MjBPY20rK0NUcDZ5L29GdGpkSDB2SC9Oa0FjQnRWS2NlaTdhSnZxZVZiCk1ja2FFenM0eUF5eisvTkh2WlJFZEgwVFFsQ1d0U09vVERXWGNEaDlvYjk0dnNlTklNZzltZ05KYy9uc05ROFIKUmhNYzBmVWpNSUo3TTdiTC82bkx2VG84WVhqYmczekd5Tk1pa3lXc3krdkp1UVNyQ2ZvZWNsR3F6c3FRd2dDbworaTZtUW5VdXFhQjJkNlpnZWdaS0dPRUlZVEdGV3BacmR0dCt0RzNWakMzRVJlMW1weDYrWmZVSDJWeDI1eEpaCnBpYVZ6R0JWd0VCdEJuczBIT1VuVWpKRnhmS1JNL0N2VDJzcDVUVkFUNnp1ZFM3cnB5VVdUck92QUFuQTNPdlQKS3Z2b1VKZG1ubUNpZFdyN010Z2dTd1ZmcTBHMTNvU1RWRXBaVVFJREFRQUJBb0lCQUYyRjBlSzQ4N1ZqRTJpTwpQMXlpOXI3Uy9pcGJVeDJ6K1c1R0lHVkwvS0FUSEdhWEVWd3Q2VHlYV3ZxZ1MvckdHS3FDUjlUVWhHUlJRTU9uCmZEenlWcnNYSjk4MER6ZHZNNFdqNC8wdXVYcEo2bi9LMW9PcEl3aWJ2aTFqeUh3NGVRTHpsTTU0KzdjM0wybnAKTlZvQ29wQ1ByWEUrNVdVdHpCNXdkMUNkSXE4S3UxTHJsbGczbXJEUEQ3RXg4Q0hoeG5KQTlLOGRJUGpzQ2tJSApUK0M1QTJWWGpzYjNSK3IxQ0p5UHg0bitQbDhqNnNWVkgyQzFSMzRwb0I0R1hvdURIemxWZUM1WXV2eTU3OEVLCnRuUHg4TXhqc0d6aFJaSkhKbHZmOStGbVpiSThMcHBQdFBzRkVPMnkyczZtWCtUQ1hmMXl3aWVUODdjSWtMdnUKQ2F3WG1uMENnWUVBNitkdVNkOWJoUG1LYTZma1d0MjVqc1JEdStWcW5aSHpySTRRQUtnV3MzVzVEYmpEQUF3aApFS25jYm1WSmRCZEJXSHJUVWI1NEJ6bWN1enAwcGMvRWZkZXVybFp0NVBVMnV1aHZFY24zVjhHOFc0cXM2NXJWCjg4cWQ5K0NEb25VdllpcTVEOGIyZ3RzVnZDRXltU1dKMjNod2dsTFNZNjY4cHBzWlZvZWlUYjhDZ1lFQTNnT3MKalJpQVBGT0dCVFBxRFRJbnZpWjA2b0R1Nk9IWURxSEUvajQydE5xZWJRRkhFekpkVEJKdUk1WnNaR3Bqa0cvUgpwZzY2R1hvcnAyQ1liU1JMSkI4Q3VtZllYTE9KUE91MFJrTTNlRG1pUXZreUVGLytiOW1yeFVCa2dZa0lzWnpYCmQwSEtFOG10UGIvWXNWVFpzU0d5OGRwZ1M4ZWtEZXJrLzY4MVBPOENnWUIvWW5nMm9jcnNza2Rodk1aZG5zODkKWFpQcDJZZEowTzlSSldGVXlXK0F0cmdYeGNaZXR5My9yb21lZjBrN3kvYjRUVkxoR0VYK09NaitmU0ZTRERCaApkOThXdXdzYWtLTmVLSGNabHdMZU8zcDN3Qm1DSEJrZVRUSWlFUFZqKzMxN3QvQTRxY3FoZktadThVbytVbnZ2CnJFaXN4d1plMTVOOUw5RnQzVTN5UndLQmdEN0lZVEpoWEZveThISm1OT2pZWng3QnQweGRlN0pGczVpbnJKS04KTzJFM2RaZXp4Y3FxOG5GQndQMjFXeCttYWxOOUc1ZFBFTmVGa2ZTNlAwQ1dBOTNLR3pabGlXemxwSWlpeXc4WAprUWNoblQ0OVJDZ1hUVmVLQWFZOVNHN05OclVyZWs4U1ByZ0x6ejdvRXJwTEdXaWE5QVNxMFpKOGVXc3FJdW9mClBQbm5Bb0dCQUxjVlRUZnkrTHBxbFlPbzdXSHIzNDBrTXlteWYvMmxTZGtmK0FDTm5lck04Z2RaZzB1Mm43NHIKTmI2ZkdiNXF5eHhOVkI3c3NVMFg2QVVONzdoQ3JWVUlVNmxWaURNRFNzbWNQdzBPU1hneUFPVnJZTTVIUU5BMApvMEVYZDBlV3JrU1V3cDFBRGR2b252eEh1czFlRG12OEk1b2RHRklOaFBtODgzcmdodFVKCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
 ----
 +
-Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues certifiactes for the service by using the provided CA.
+Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues a certificate for the service by using the provided CA.
 
-11. Additionally, you can also provide a custom Issuer, such as Certificate Authority (CA) or vault, for the service certificates. Create an Issuer instance with the following content:
+17. Edit OpenLibertyApplication to update certificate reference for the route:
 +
 [source,yaml]
 ----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: olo-custom-issuer
 spec:
-  vault:
-    auth:
-      tokenSecretRef:
-        key: token
-        name: vault-token
-    path: pki/sign/cert-manager
-    server: >-
-      https://vault-internal.vault.svc:8201
+...
+  route:
+    certificateSecretRef: olo-custom-ca-tls
 ----
-+
-Note that the issuer's name is `olo-custom-issuer`. This way, the operator knows that a custom issuer exists.
 
-12. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false. To edit, click `Search` tab on the left and search for `OpenLibertyApplications` resource, and select `certificate-liberty-app` instance again. Edit the OpenLibertyApplication instance as the following: 
+18. Revisit the application page on your browser. Check the certificate again. The certificate is now issued to `ibm.com` and issued by `ibm.com`.
 +
-Change `manageTLS: true` under `spec` field to `manageTLS: false`:
+image:images/custom-certificate.png[,900]
+
+19. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false: 
 +
 [source,yaml]
 ----
+spec:
+...
   manageTLS: false
 ----
 +
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
-13. Check the status of the OpenLibertyApplication instance again.
+20. Check the status of the OpenLibertyApplication instance again.
++
+image:images/status-conditions-no-tls.png[,900]
++
+As in the example, the application should be ready even without TLS configuration. Without TLS management, `svcCertSecretName` field should now be gone.
 // ====

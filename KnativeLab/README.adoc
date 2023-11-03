@@ -41,7 +41,7 @@ oc login --server=https://9.123.456.789:6443 --username=testuser --password=Pass
 If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
 
-2. To set your current namespace to be the namespace you will be working in, run the following commands:
+3. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
 NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab._
 +
@@ -51,7 +51,7 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 
-3. Ensure `Red Hat OpenShift Serverless` operator is installed on the cluster and Knative Serving instance is Ready.
+4. Ensure `Red Hat OpenShift Serverless` operator is installed on the cluster and Knative Serving instance is Ready.
 +
 [source,sh]
 ----
@@ -71,7 +71,7 @@ knative-serving   1.9       True
 +
 If you do not see any of the two outputs correctly, contact Lab Administrators.
 
-4. Create a YAML file called `knative-enabled-sample.yaml` with the following content:
+5. Create a YAML file called `knative-enabled-sample.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -89,7 +89,7 @@ spec:
     type: ClusterIP
 ----
 
-5. Create the OpenLibertyApplication instance using the command:
+6. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -98,7 +98,7 @@ oc apply -f knative-enabled-sample.yaml
 +
 The operator will create a Knative Service resource which manages the entire life cycle of a workload.
 
-6. Check the status of the OpenLibertyApplication instance by running:
+7. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -131,7 +131,7 @@ It will print output similar to the following:
 +
 As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
 
-7. Check the managed resources and their statuses. Run the command: 
+8. Check the managed resources and their statuses. Run the command: 
 +
 [source,sh]
 ----
@@ -172,7 +172,7 @@ It shows Deployment and its associated Pods, Services, Route and Knative resourc
 +
 Knative service autoscales the workload and when the workload is idle, it may scale the pod to zero. Then the pod will not be included in the output. When traffic is observed, the pod will be scaled back up.
 
-8. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
+9. Get the URL allocated by `route.serving.knative.dev/knative-enabled-sample`. For example: `https://knative-enabled-sample-liberty-lab.apps.operators.cp.fyre.ibm.com`.
 +
 [source,sh]
 ----
@@ -189,7 +189,7 @@ Access the page, and you will be able to see the sample Liberty app page with Op
 +
 image:images/sample-app-page.png[,800]
 
-9. Let's take a closer look at the Knative service instance. Run below to get the revision details:
+10. Let's take a closer look at the Knative service instance. Run below to get the revision details:
 +
 [source,sh]
 ----
@@ -204,7 +204,7 @@ knative-enabled-sample-00001   knative-enabled-sample                      1    
 +
 You will see that the revision's generation is 1. This captures point-in-time snapshot of the Knative service. The actual and desired replicas in the output may be 0's because of Knative service's scale-to-zero feature when the pod is idle.
 
-10. Edit OpenLibertyApplication to update application image. Edit `applicationImage` field under `spec` field:
+11. Edit OpenLibertyApplication to update application image. Edit `applicationImage` field under `spec` field:
 +
 [source,sh]
 ----
@@ -224,7 +224,7 @@ Wait until the application pod is ready. You can check if the pod is ready throu
 oc get pods -l app.kubernetes.io/part-of=knative-enabled-sample -n $NAMESPACE
 ----
 
-11. Access the sample app on browser again to update the pod. You will see that the version is updated to Open Liberty 23.0.0.8 from 23.0.0.3.
+12. Access the sample app on browser again to update the pod. You will see that the version is updated to Open Liberty 23.0.0.8 from 23.0.0.3.
 +
 image:images/sample-app-page-new.png[,800]
 +
@@ -244,7 +244,7 @@ knative-enabled-sample-00002   knative-enabled-sample                      2    
 +
 You can now see 2 revision outputs. Notice `knative-enabled-sample-00002` instance's generation value is 2 and the replicas are running under that revision.
 
-12. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit Knative service to use both revisions.
+13. You can rollback to the previous revision, distribute traffic to both revisions and also rollout to the latest revision. Edit Knative service to use both revisions.
 +
 [source,sh]
 ----
@@ -266,9 +266,9 @@ Edit `traffic` field under `spec` field:
 +
 This will route 50% of traffic to the first revision and the other 50% to the latest revision.
 
-13. Access the sample app on browser again and try refreshing the page several times. It will change the Open Liberty version from time to time. This ensures 50% of the traffic is assigned to the first revision (23.0.0.3) and the other to the second revision (23.0.0.8).
+14. Access the sample app on browser again and try refreshing the page several times. It will change the Open Liberty version from time to time. This ensures 50% of the traffic is assigned to the first revision (23.0.0.3) and the other to the second revision (23.0.0.8).
 
-14. Edit OpenLibertyApplication to disable Knative configuration. Locate `createKnativeService` field under `spec` field and change its value to false:
+15. Edit OpenLibertyApplication to disable Knative configuration. Locate `createKnativeService` field under `spec` field and change its value to false:
 +
 [source,sh]
 ----
@@ -283,7 +283,7 @@ spec:
 ...
 ----
 
-15. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
+16. When you check the managed resources, you will see that Knative managed resources are deleted and new Deployment, Service and Route resources are created.
 +
 [source,sh]
 ----
@@ -310,7 +310,7 @@ NAME                                              HOST/PORT                     
 route.route.openshift.io/knative-enabled-sample   knative-enabled-sample-test-namespace.apps.liberty-operator.cp.fyre.ibm.com          knative-enabled-sample   9080-tcp   reencrypt     None
 ----
 
-16. Check the status of the OpenLibertyApplication instance by running:
+17. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
