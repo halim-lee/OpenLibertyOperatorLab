@@ -9,33 +9,42 @@ Red Hat OpenShift Container Platform 4.12 or newer
 
 Log into a RedHat OpenShift cluster through console. Click `OperatorHub` tab to install operators.
 
-=== Cert-Manager Operator
+== Cert-Manager Operator
 Search `cert-manager Operator for Red Hat OpenShift`.
+
 image:images/cert-manager-operatorhub.png[,900]
 
 Click the result and `install` button. Install the operator with the default settings.
+
 image:images/cert-manager-settings.png[,700]
 
 
-=== Knative Serving
+== Knative Serving
 Search `Red Hat OpenShift Serverless`.
+
 image:images/knative-operatorhub.png[,900]
 
 Click the result and `install` button. Install the operator with the default settings.
+
 image:images/knative-settings.png[,700]
 
 Click `Installed Operators` tab to see installed operators. Select `knative-serving` project to install `Knative Serving` instance. Click `Knative Serving` under Provided APIs.
+
 image:images/installed-operators.png[,900]
 
 Click `Create KnativeServing`. Create with default settings.
+
 image:images/knative-serving-settings.png[,900]
 
 When `Knative Serving` is successfully created, you should see Serverless tab created on the left and `Ready` status.
+
 image:images/installed-knative-serving.png[,900]
 
-=== Open Liberty Operator
+== Open Liberty Operator
 Search `Open Liberty`.
+
 image:images/ol-operatorhub.png[,900]
 
 Click the result and `install` button. If you would like to install the operator in all namespaces, install with the default settings. If you would like to install it only on one namespace, choose `A specific namespace on the cluster` under *Installation mode* and select a project to install.
+
 image:images/ol-settings.png[,700]
