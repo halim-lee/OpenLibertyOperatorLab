@@ -60,6 +60,13 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
   expose: false
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 ----
 
 5. Create the OpenLibertyApplication instance using the command:
@@ -68,7 +75,7 @@ spec:
 ----
 oc apply -f liberty-autoscaling.yaml
 ----
-This will create a Deployment named `autoscaling-liberty-app` with 1 replica.
+This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The resources field defines a metric source for targeted container resources.
 
 6. Check the status of the OpenLibertyApplication instance by running:
 +
@@ -304,6 +311,13 @@ spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
   expose: false
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 ----
 +
 This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
