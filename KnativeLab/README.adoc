@@ -20,8 +20,8 @@ One of the key benefits of Knative Serving is its automatic scaling feature, whi
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-// [%collapsible]
-// ====
+[%collapsible]
+====
 1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
 
 2. Log into a RedHat OpenShift cluster.
@@ -39,7 +39,6 @@ oc login --server=https://9.123.456.789:6443 --username=testuser --password=Pass
 ----
 +
 If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
-
 
 3. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
@@ -129,7 +128,7 @@ It will print output similar to the following:
 ]
 ----
 +
-As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log.
+As in the example output, `status` field shows that Knative service is ready instead of reporting the number of application replicas. If the `status` reports that the Application is not ready, check the pod's log, by running `oc logs <pod_name>`. You can get the pod name through `oc get pods -n $NAMESPACE`.
 
 8. Check the managed resources and their statuses. Run the command: 
 +
@@ -345,14 +344,14 @@ Then the output will be similar to the following:
 +
 Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1.
 
-// ====
+====
 
 
 .*Method B: Deployment through OpenShift Web Console*
-// [%collapsible]
-// ====
+[%collapsible]
+====
 
-1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.apps.
+1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.apps. If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assigned with for the lab.
 +
@@ -366,7 +365,7 @@ Make sure you see *Knative Serving* in the list. If not, please contact Lab Admi
 +
 image:images/operator-backed-knative.png[,800]
 
-4. Click OpenLibertyApplication and create an instance.
+4. Click *OpenLibertyApplication* and create an instance.
 +
 image:images/create-instance.png[,800]
 +
@@ -460,4 +459,4 @@ Now the OpenLibertyApplication instance is reporting that the application is hos
 +
 image:images/topology-non-knative.png[,900]
 
-// ====
+====

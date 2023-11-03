@@ -20,8 +20,8 @@ There are three methods to generate and configure certificates with Open Liberty
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-// [%collapsible]
-// ====
+[%collapsible]
+====
 1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
 
 2. Log into a RedHat OpenShift cluster.
@@ -39,7 +39,6 @@ oc login --server=https://9.123.456.789:6443 --username=testuser --password=Pass
 ----
 +
 If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
-
 
 3. To set your current namespace to be the namespace you will be working in, run the following commands:
 +
@@ -113,7 +112,7 @@ It will print output similar to the following:
 }
 ----
 +
-As in the example output, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log. `svcCertSecretName` field shows the generated certificate secret name that the application uses.
+As in the example output, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log, by running `oc logs <pod_name>`. You can get the pod name through `oc get pods -n $NAMESPACE`. `svcCertSecretName` field shows the generated certificate secret name that the application uses.
 
 7. Get the application pod name by running:
 +
@@ -362,13 +361,13 @@ oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.condi
 +
 As in the example output, the application should be ready even without TLS configuration. Without TLS management, `svcCertSecretName` field should now be gone.
 
-// ====
+====
 
 .*Method B: Deployment through OpenShift Web Console*
-// [%collapsible]
-// ====
+[%collapsible]
+====
 
-1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.
+1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.apps. If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assgined with for the lab.
 +
@@ -378,7 +377,7 @@ image:images/perspective.png[,300]
 +
 image:images/operator-backed.png[,500]
 
-4. Click OpenLibertyApplication and create an instance.
+4. Click *OpenLibertyApplication* and create an instance.
 +
 image:images/create-instance.png[,800]
 +
@@ -523,4 +522,4 @@ The operator will no longer manage the certificates. Manual configuration is req
 image:images/status-conditions-no-tls.png[,900]
 +
 As in the example, the application should be ready even without TLS configuration. Without TLS management, `svcCertSecretName` field should now be gone.
-// ====
+====
