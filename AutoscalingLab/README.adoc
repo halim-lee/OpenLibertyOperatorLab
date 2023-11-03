@@ -192,7 +192,7 @@ NAME                                                          REFERENCE         
 horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   <unknown>/50%   2         3         2          67s
 ----
 
-10. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait for the resource to be ready.
+10. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait for the HPA resource to receive metrics from the application pod.
 +
 [source,sh]
 ----
@@ -357,9 +357,11 @@ Compared to the last status output, `ResourcesReady` type now outputs the number
 +
 image:images/topology-new.png[,900]
 +
-When you click on the HPA resource and scroll down to see the status condition, you should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum replica count. That is okay for this lab, since it is reporting there can be only 1 replica running. These report that the workload is being scaled with desired resource utilization.
+Click on the HPA resource and scroll down to the status condition to see if scaling is working as expected. You may have to wait for the HPA resource to receive metrics from the application pod.
 +
 image:images/hpa-status-conditions.png[,900]
++
+You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum replica count. That is okay for this lab, since it is reporting there can be only 1 replica running. These report that the workload is being scaled with desired resource utilization.
 
 12. Edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
 +
