@@ -285,6 +285,13 @@ data:
 ----
 +
 Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues a certificate for the service by using the provided CA.
++
+Create the Secret using the command:
++
+[source,sh]
+----
+oc apply -f cert-secret.yaml
+----
 
 17. Edit OpenLibertyApplication to update certificate reference for the route.
 +
