@@ -65,7 +65,7 @@ You will get similar to the following if the operator is installed and the insta
 NAME                  PACKAGE               SOURCE             CHANNEL
 serverless-operator   serverless-operator   redhat-operators   stable
 NAME              VERSION   READY   REASON
-knative-serving   1.9       True  
+knative-serving   1.10       True  
 ----
 +
 If you do not see any of the two outputs correctly, contact Lab Administrators.
@@ -223,7 +223,7 @@ Wait until the application pod is ready. You can check if the pod is ready throu
 oc get pods -l app.kubernetes.io/part-of=knative-enabled-sample -n $NAMESPACE
 ----
 
-12. Access the sample app on browser again to update the pod. You will see that the version is updated to Open Liberty 23.0.0.8 from 23.0.0.3.
+12. Access the sample app on browser again to update the pod. You will see that the version is updated to Open Liberty 23.0.0.8 from 23.0.0.3. You may have to wait for a few minutes to see the updated version.
 +
 image:images/sample-app-page-new.png[,800]
 +
@@ -265,7 +265,7 @@ Edit `traffic` field under `spec` field:
 +
 This will route 50% of traffic to the first revision and the other 50% to the latest revision.
 
-14. Access the sample app on browser again and try refreshing the page several times. It will change the Open Liberty version from time to time. This ensures 50% of the traffic is assigned to the first revision (23.0.0.3) and the other to the second revision (23.0.0.8).
+14. Access the sample app on browser again and try refreshing the page several times. It will change the Open Liberty version from time to time. 50% of the traffic is assigned to the first revision (23.0.0.3) and the other to the second revision (23.0.0.8). This feature helps dividing traffic between different revisions. 
 
 15. Edit OpenLibertyApplication to disable Knative configuration. Locate `createKnativeService` field under `spec` field and change its value to false:
 +
@@ -343,6 +343,13 @@ Then the output will be similar to the following:
 ----
 +
 Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1.
+
+18. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+[source,sh]
+----
+oc delete OpenLibertyApplication/knative-enabled-sample
+----
 
 ====
 
@@ -435,7 +442,7 @@ You can rollback to the previous revision, distribute traffic to both revisions 
 +
 image:images/traffic-distribution.png[,500]
 
-12. Access the page through route again. The traffic can be routed to any of the two revisions by 50% chance. Try refreshing the page several times. From time to time, you will see that the version gets changed on the page.
+12. Access the page through route again and try refreshing the page several times. It will change the Open Liberty version from time to time. 50% of the traffic is assigned to the first revision (23.0.0.3) and the other to the second revision (23.0.0.8). This feature helps dividing traffic between different revisions. 
 +
 image:images/topology-new.png[,900]
 +
@@ -458,5 +465,9 @@ image:images/status-new.png[,900]
 Now the OpenLibertyApplication instance is reporting that the application is hosted as a Deployment with static replica of 1. When you check the managed resources in `Topology` section, you will no longer see Knative related resources. You will see that new Deployment, Service and Route resources are created.
 +
 image:images/topology-non-knative.png[,900]
+
+15. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+image:images/delete-app.png[,500]
 
 ====
