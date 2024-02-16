@@ -292,7 +292,7 @@ Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows
 ----
 oc edit OpenLibertyApplication certificate-liberty-app
 ----
-Then edit `service` and `route` field under `spec` field as the following:
+Then edit `route` field under `spec` field as the following:
 +
 [source,yaml]
 ----
@@ -360,6 +360,14 @@ oc get OpenLibertyApplication certificate-liberty-app -ojson | jq '.status.condi
 ----
 +
 As in the example output, the application should be ready even without TLS configuration. Without TLS management, `svcCertSecretName` field should now be gone.
+
+
+21. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+[source,sh]
+----
+oc delete OpenLibertyApplication/certificate-liberty-app
+----
 
 ====
 
@@ -473,7 +481,11 @@ This configuration adds annotation to use Red Had OpenShift CA. It will ensure `
 +
 image:images/search-secret-new.png[,700]
 
-16. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a secret by clicking `Secrets`, `Create` and `From YAML`. Create a secret with the following content:
+16. Revisit the application page on your browser. Check the certificate again. The certificate is still issued to `certificate-liberty-app.test-namespace.svc` but is now issued by `openshift-service-serving-signer`.
++
+image:images/ocp-route-certificate.png[,900]
+
+17. Let us consider a scenario where you already have a CA certificate ready. Instead of having the operator create its own CA for issuing service certificates, you can bring your own CA certificate. Create a secret by clicking `Secrets`, `Create` and `From YAML`. Create a secret with the following content:
 +
 [source,yaml]
 ----
@@ -492,7 +504,7 @@ data:
 +
 Note that the secret's name is `olo-custom-ca-tls`. This way, the operator knows that a custom CA certificate exists and reissues a certificate for the service by using the provided CA.
 
-17. Edit OpenLibertyApplication to update certificate reference for the route:
+18. Edit OpenLibertyApplication to update certificate reference for the route:
 +
 [source,yaml]
 ----
@@ -502,11 +514,11 @@ spec:
     certificateSecretRef: olo-custom-ca-tls
 ----
 
-18. Revisit the application page on your browser. Check the certificate again. The certificate is now issued to `ibm.com` and issued by `ibm.com`.
+19. Revisit the application page on your browser. Check the certificate again. The certificate is now issued to `ibm.com` and issued by `ibm.com`.
 +
 image:images/custom-certificate.png[,900]
 
-19. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false: 
+20. Edit the OpenLibertyApplication instance to disable automatic generation of certificates by setting `.spec.manageTLS` field to false: 
 +
 [source,yaml]
 ----
@@ -517,9 +529,14 @@ spec:
 +
 The operator will no longer manage the certificates. Manual configuration is required for TLS certificates, probes, monitoring, routes and other parameters.
 
-20. Check the status of the OpenLibertyApplication instance again.
+21. Check the status of the OpenLibertyApplication instance again.
 +
 image:images/status-conditions-no-tls.png[,900]
 +
 As in the example, the application should be ready even without TLS configuration. Without TLS management, `svcCertSecretName` field should now be gone.
+
+22. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+image:images/delete-app.png[,500]
+
 ====
