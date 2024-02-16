@@ -378,6 +378,13 @@ replicaset.apps/semeru-enabled-sample-569564f774   2         2         2       6
 replicaset.apps/semeru-enabled-sample-7bfddd57f4   0         0         0       34m
 replicaset.apps/semeru-enabled-sample-7cb5b9648    0         0         0       8m7s
 ----
+
+17. Please delete the OpenLibertyApplication instance to clean up the resources.
+[source,sh]
+----
+oc delete OpenLibertyApplication/semeru-enabled-sample
+----
+
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
@@ -521,5 +528,9 @@ spec:
 image:images/topology-no-semeru.png[,900]
 +
 You will be able to see that the pods of JIT Server are now removed.
+
+15. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+image:images/delete-app.png[,500]
 
 ====
