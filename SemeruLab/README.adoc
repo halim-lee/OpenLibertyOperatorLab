@@ -217,7 +217,7 @@ Found mounted TLS CA certificate, adding to truststore
 +
 You can see that the Liberty application is successfully connected to JIT Server pod.
 
-11. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image.
+11. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image. Please note `replicas` field under `semeruCloudCompiler` should stay the same.
 +
 [source,sh]
 ----
@@ -474,7 +474,7 @@ You can see that the Liberty application is successfully connected to JIT Server
 +
 image:images/ola.png[,500]
 +
-Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image.
+Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image. Please note `replicas` field under `semeruCloudCompiler` should stay the same.
 +
 [source,yaml]
 ----
