@@ -396,7 +396,7 @@ image:images/operator-backed.png[,500]
 +
 image:images/create-instance.png[,800]
 +
-Select YAML view and copy the following content:
+Select YAML view and replace the default configuration with the following content:
 +
 [source,yaml]
 ----

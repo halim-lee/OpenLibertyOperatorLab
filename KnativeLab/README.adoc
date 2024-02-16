@@ -376,7 +376,7 @@ image:images/operator-backed-knative.png[,800]
 +
 image:images/create-instance.png[,800]
 +
-Select YAML view and copy the following content:
+Select YAML view and replace the default configuration with the following content:
 +
 [source,yaml]
 ----

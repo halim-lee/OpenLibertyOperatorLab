@@ -306,7 +306,7 @@ image:images/operator-backed.png[,500]
 +
 image:images/create-instance.png[,800]
 
-5. Create an OpenLibertyApplication instance through YAML view.
+5. Select YAML view and replace the default configuration with the following content:
 +
 [source,yaml]
 ----
