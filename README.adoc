@@ -26,11 +26,11 @@ Before starting the lab, please ensure you meet the following requirements:
 +
 [source,sh]
 ----
-sudo mv oc kubectl /usr/local/bin/
+sudo mv oc /usr/local/bin/
 ----
 *** Windows:
 +
-Copy the `oc` and `kubectl` files to your binary directory.
+Copy the `oc` file to your binary directory.
 2. Access to an OpenShift cluster with Open Liberty Operator already installed.
 +
 [source,sh]
