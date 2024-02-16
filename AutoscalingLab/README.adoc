@@ -296,7 +296,7 @@ oc delete OpenLibertyApplication/autoscaling-liberty-app
 
 2. Switch to the Developer perspective, if it is set to the Administrator perspective. Ensure you are on a project/namespace that you were assigned with for the lab.
 +
-image:images/perspective.png[,300]
+image:images/perspective.png[,500]
 
 3. Click `+Add`. Under `Developer Catalog`, click `Operator Backed`. This page shows the operator catalog on the cluster and enables you to deploy operator managed services.
 +
