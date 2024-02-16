@@ -59,14 +59,14 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
-  expose: false
+  expose: true
   resources:
     limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 256Mi
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 256Mi
 ----
 
 5. Create the OpenLibertyApplication instance using the command:
@@ -192,7 +192,7 @@ NAME                                                          REFERENCE         
 horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   <unknown>/50%   2         3         2          67s
 ----
 
-10. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait for the HPA resource to receive metrics from the application pod.
+10. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait up to several minutes for the HPA resource to receive metrics from the application pod.
 +
 [source,sh]
 ----
@@ -228,7 +228,7 @@ It will print output similar to the following:
 ]
 ----
 +
-You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum replica count. That is okay for this lab, since it is reporting there can be only 1 replica running. These report that the workload is being scaled with desired resource utilization.
+You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count. These report that the workload is being scaled with desired resource utilization.
 
 11. Edit the OpenLibertyApplication instance to disable autoscaling feature by setting `.spec.autoscaling` field empty. Run the command:
 +
@@ -280,6 +280,13 @@ oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.condi
 +
 As in the example output, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
 
+13. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+[source,sh]
+----
+oc delete OpenLibertyApplication/autoscaling-liberty-app
+----
+
 ====
 
 .*Method B: Deployment through OpenShift Web Console*
@@ -310,14 +317,14 @@ metadata:
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started
   replicas: 1
-  expose: false
+  expose: true
   resources:
     limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 256Mi
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 256Mi
 ----
 +
 This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
@@ -361,7 +368,7 @@ Click on the HPA resource and scroll down to the status condition to see if scal
 +
 image:images/hpa-status-conditions.png[,900]
 +
-You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum replica count. That is okay for this lab, since it is reporting there can be only 1 replica running. These report that the workload is being scaled with desired resource utilization.
+You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count. These report that the workload is being scaled with desired resource utilization.
 
 12. Edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
 +
@@ -378,5 +385,9 @@ spec:
 image:images/status-no-hpa.png[,700]
 +
 As in the example, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
+
+14. Please delete the OpenLibertyApplication instance to clean up the resources.
++
+image:images/delete-app.png[,500]
 
 ====
