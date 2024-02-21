@@ -32,7 +32,8 @@ sudo mv oc /usr/local/bin/
 ----
 *** Windows:
 +
-Copy the `oc` files to your binary directory.
+Copy the `oc` file to your binary directory.
+
 2. Access to an OpenShift cluster with Open Liberty Operator already installed.
 +
 [source,sh]
