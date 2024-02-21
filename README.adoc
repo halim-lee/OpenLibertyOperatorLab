@@ -4,10 +4,12 @@ Welcome to the Open Liberty Operator Labs. This series of labs is designed to he
 
 During the lab sessions, you will have the opportunity to explore the following features:
 
-* link:++AutoscalingLab++[Horizontal Pod Autoscaling with CPU and Memory resource constraints]
-* link:++KnativeLab++[Knative services]
-* link:++SemeruLab++[Semeru Cloud Compiler (JIT Server integration)]
-* link:++CertManagerLab++[Certificate management and TLS]
+* link:++1-AutoscalingLab++[Horizontal Pod Autoscaling with CPU and Memory resource constraints]
+* link:++2-KnativeLab++[Knative services]
+* link:++3-CertManagerLab++[Certificate management and TLS]
+* link:++4-SemeruLab++[Semeru Cloud Compiler (JIT Server integration)]
+
+Please follow the order from top to bottom.
 
 == Open Liberty Operator
 If you are interested in gaining in-depth knowledge about Open Liberty Operator, refer to the link:++https://github.com/OpenLiberty/open-liberty-operator/blob/main/doc/user-guide-v1.adoc++[documentation].
@@ -26,11 +28,11 @@ Before starting the lab, please ensure you meet the following requirements:
 +
 [source,sh]
 ----
-sudo mv oc kubectl /usr/local/bin/
+sudo mv oc /usr/local/bin/
 ----
 *** Windows:
 +
-Copy the `oc` and `kubectl` files to your binary directory.
+Copy the `oc` files to your binary directory.
 2. Access to an OpenShift cluster with Open Liberty Operator already installed.
 +
 [source,sh]
