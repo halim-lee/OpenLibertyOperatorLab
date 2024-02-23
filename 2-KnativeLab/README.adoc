@@ -210,17 +210,18 @@ knative-enabled-sample-00001   knative-enabled-sample                      1    
 +
 You will see that there is only 1 revision. This captures point-in-time snapshot of the Knative service. The actual and desired replicas in the output may be 0's because of Knative service's scale-to-zero feature when the pod is idle.
 
-8. Edit OpenLibertyApplication to update application image. Edit `applicationImage` field under `spec` field:
-+
-[source,sh]
-----
-oc edit OpenLibertyApplication knative-enabled-sample -n $NAMESPACE
-----
+8. Edit OpenLibertyApplication in `knative-enabled-sample.yaml` to update application image. Edit `applicationImage` field under `spec` field:
 +
 [source,yaml]
 ----
 spec:
   applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:f7c7da21059eef8734cf0d43a417609aecf68bfe89d0be8e61012fade5877a01
+----
+To apply the changes, run:
++
+[source,sh]
+----
+oc apply -f knative-enabled-sample.yaml
 ----
 +
 Wait until the application pod is ready. You can check if the pod is ready through running the following:

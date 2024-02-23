@@ -224,19 +224,25 @@ Found mounted TLS CA certificate, adding to truststore
 +
 You can see that the Liberty application is successfully connected to JIT Server pod.
 
-8. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Under `spec` field, modify `replicas` to 2 and `applicationImage` field to another image. Notice the image's digest value has changed. Please note `replicas` field under `semeruCloudCompiler` should stay the same.
-+
-[source,sh]
-----
-oc edit OpenLibertyApplication/semeru-enabled-sample
-----
+8. The operator will instantly detect when the application image is modified or updated. Then the operator will create a new set of JIT Server pods for the new application pods. Edit OpenLibertyApplication in `liberty-semeru.yaml`. Under `spec` field, modify `replicas` to 2 and `applicationImage` field to the new image. Notice the image's digest value has changed. Please note `semeruCloudCompiler.replicas` field stays as 1.
 +
 [source,yaml]
 ----
 spec:
-  applicationImage: icr.io/appcafe/open-liberty/samples/getting-started@sha256:f7c7da21059eef8734cf0d43a417609aecf68bfe89d0be8e61012fade5877a01
-...
+  applicationImage: >-
+    icr.io/appcafe/open-liberty/samples/getting-started@sha256:f7c7da21059eef8734cf0d43a417609aecf68bfe89d0be8e61012fade5877a01
   replicas: 2
+  semeruCloudCompiler:
+    enable: true
+    replicas: 1
+  ...
+----
++
+To apply the changes, run:
++
+[source,sh]
+----
+oc apply -f liberty-semeru.yaml
 ----
 
 9. Check the status of managed resources. You may have to wait until the Liberty app deployment's pods are all updated to the new image.
@@ -312,14 +318,7 @@ It will print output similar to the following:
 +
 The version check enables easy cleanup of the old version of JIT Server with the numbering naming convention.
 
-12. To disable JIT Server integration, make changes to the OpenLibertyApplication instance.
-+
-[source,sh]
-----
-oc edit OpenLibertyApplication/semeru-enabled-sample
-----
-+
-Then change `semeruCloudCompiler.enable` to false under `spec` field.
+12. To disable JIT Server integration, make changes to the OpenLibertyApplication instance in `liberty-semeru.yaml`. Change `semeruCloudCompiler.enable` to false under `spec` field:
 +
 [source,yaml]
 ----
@@ -327,6 +326,13 @@ spec:
 ...
   semeruCloudCompiler:
     enable: false
+----
++
+To apply the changes, run:
++
+[source,sh]
+----
+oc apply -f liberty-semeru.yaml
 ----
 
 13. Check the instance's status sections.
