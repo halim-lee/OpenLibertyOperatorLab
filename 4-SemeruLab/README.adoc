@@ -12,7 +12,7 @@ The `Semeru Cloud Compiler` efficiently manages Just-In-Time (JIT) compilation r
 
 == Getting Started
 * Using educational cluster? If you need access to the cluster, please contact Lab Administrators to have credentials assigned to you.
-* Using your own cluster? Please follow link:++../Prerequisites.adoc++[Prerequisites guide] before proceeding.
+* Using your own cluster? Please follow link:++../OCPClusterPrereq.adoc++[Cluster Prerequisite guide] before proceeding.
 
 == Deployment Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
@@ -127,7 +127,7 @@ It will print output similar to the following:
   }
 ]
 ----
-As in the example output, `message` field shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, the application is ready. If any type under status conditions section reports that the Application is not ready even after a considerate amount of time, check the application's log, by running `oc logs deployment/semeru-enabled-sample`.
+As in the example output, `ResourcesReady` 's message field shows the number of running replicas out of configured number of replicas. When the status reports both `ResourcesReady` and `Ready`, the application is ready. If any type under status conditions section reports that the Application is not ready even after a considerate amount of time, check the application's log, by running `oc logs deployment/semeru-enabled-sample`.
 
 4. Check semeru related properties in the status section as well.
 +
@@ -467,7 +467,7 @@ image:images/topology.png[,900]
 +
 image:images/ola.png[,500]
 +
-Scroll to the botton of the YAML file. As in the example, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+Scroll to the botton of the YAML file. As in the example, `ResourcesReady` 's message field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
 +
 image:images/status.png[,900]
 +

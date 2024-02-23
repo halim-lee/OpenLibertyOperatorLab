@@ -13,7 +13,7 @@ During the lab sessions, you will have the opportunity to explore the following 
 If you are interested in gaining in-depth knowledge about Open Liberty Operator, refer to the link:++https://github.com/OpenLiberty/open-liberty-operator/blob/main/doc/user-guide-v1.adoc++[documentation].
 
 == Lab Prerequisites
-Before starting the lab, please ensure you meet the following requirements:
+If you choose to run the lab through terminal using `oc` client, please ensure you meet the following requirements before starting the lab:
 
 1. The `oc` client installed on your system. If you do not have it installed, follow the steps:
 ** Download the client through the link:++https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/++[link]:
@@ -76,6 +76,9 @@ oc project $NAMESPACE
 ** CLUSTER_URL, CLUSTER_USER, CLUSTER_TOKEN and ASSIGNED_NAMESPACE will be provided to you before the lab. If you do not have access, please contact the Lab Administrator to obtain the necessary permissions.
 3. Ensure `jq` is installed.
 ** Download and install the binary through the link:++https://jqlang.github.io/jq/download/++[link].
+
+== Using your own Red Hat OpenShift Container Platform
+Set up your own cluster to meet the cluster requirements following link:++../OCPClusterPrereq.adoc++[Cluster Prerequisite guide]
 
 == Kubernetes Basics
 If you are new to containers and Kubernetes, see below to learn the basics.
