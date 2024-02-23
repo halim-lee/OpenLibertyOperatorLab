@@ -20,8 +20,8 @@ One of the key benefits of Knative Serving is its automatic scaling feature, whi
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
 
 .*Method A: Deployment through `oc` client*
-// [%collapsible]
-// ====
+[%collapsible]
+====
 
 ._Environment setup: If already setup, you can close this section_
 [%collapsible%open]
@@ -384,8 +384,8 @@ oc delete OpenLibertyApplication/knative-enabled-sample
 
 
 .*Method B: Deployment through OpenShift Web Console*
-// [%collapsible]
-// ====
+[%collapsible]
+====
 
 1. Access your OpenShift web console. Web console's URL starts with https://console-openshift-console.apps. If you do not have access to a cluster, please contact Lab Administrators to have credentials assigned to you.
 
