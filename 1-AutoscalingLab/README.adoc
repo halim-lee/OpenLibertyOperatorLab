@@ -117,13 +117,12 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ]
 ----
 +
-As in the example output, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log, by running `oc logs <pod_name>`. You can get the pod name through `oc get pods -n $NAMESPACE`.
+As in the example output, `message` field shows the static number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready even after a considerate amount of time, check the application's log, by running `oc logs deployment/autoscaling-liberty-app`.
 
-4. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Remove `replicas: 1` under `spec` field and replace it with `autoscaling` field:
+4. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Under `spec` field, remove `replicas: 1` and replace it with `autoscaling` field:
 +
 [source,yaml]
 ----
-spec:
   autoscaling:
     maxReplicas: 3
     minReplicas: 2
@@ -171,7 +170,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ]
 ----
 +
-Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
+Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready for long, check the log.
 
 6. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
@@ -236,16 +235,13 @@ It will print output similar to the following:
 ]
 ----
 +
-You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count. These report that the workload is being scaled with desired resource utilization.
+You should see `AbleToScale` and `ScalingActive` type reporting `True`. These report that the workload is being scaled with desired resource utilization. Depending on the resource consumption at the moment, `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count.
 
-8. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
+8. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, remove all fields under `autoscaling`:
 +
 [source,yaml]
 ----
-spec:
-...
   autoscaling:
-
 ----
 +
 Apply the changes using the command:
@@ -286,7 +282,7 @@ oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.condi
 ]
 ----
 +
-As in the example output, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
+As in the example output, `message` field shows the static number of running replicas out of configured number of replicas again with HPA disabled.
 
 10. Please delete the OpenLibertyApplication instance to clean up the resources.
 +
@@ -310,11 +306,11 @@ image:images/perspective.png[,500]
 +
 image:images/operator-backed.png[,500]
 
-4. Click OpenLibertyApplication and create an instance.
+4. Click *OpenLibertyApplication* and create an instance.
 +
 image:images/create-instance.png[,800]
-
-5. Select YAML view and replace the default configuration with the following content:
++
+Select YAML view and replace the default configurations with the following content:
 +
 [source,yaml]
 ----
@@ -337,23 +333,28 @@ spec:
 +
 This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The `resources` field defines a metric source for targeted container resources.
 
-6. You will see that an instance is created in `Topology` page. Click `OLA autoscaling-liberty-app` to see its resources. You can select a resource that you would like to investigate.
+5. You will see that an instance is created in `Topology` page. Click `*OLA* autoscaling-liberty-app` to see its resources. You can select a resource that you would like to investigate.
 +
 image:images/topology.png[,900]
 
-7. If you would like to see the instance's status at once, click 3 dots beside `OLA autoscaling-liberty-app`, then `Edit OpenLibertyApplication`.
+6. If you would like to see the instance's status at once, click 3 dots beside `*OLA* autoscaling-liberty-app`, then `Edit OpenLibertyApplication`.
 +
 image:images/ola.png[,500]
 
-8. Scroll to the botton of the YAML file. As in the example, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log.
+7. Scroll to the botton of the YAML file. As in the example, `message` field shows the static number of running replicas out of configured number of replicas.
+
 +
 image:images/status.png[,700]
++
+If the `status` reports that the Application is not ready even after a considerate amount of time, check the application's log through Topology page.
++
+image:images/pod-log.png[,700]
 
-9. Edit the OpenLibertyApplication instance to use autoscaling feature by configuring `autoscaling` field under `spec` field as the following:
+
+8. Edit the OpenLibertyApplication instance to use autoscaling feature. Under `spec` field, remove `replicas: 1` and replace it with `autoscaling` field:
 +
 [source,yaml]
 ----
-spec:
   autoscaling:
     maxReplicas: 3
     minReplicas: 2
@@ -362,37 +363,34 @@ spec:
 +
 In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-10. Check the instance’s status again.
+9. Check the instance's status again.
 +
 image:images/status-new.png[,700]
 +
-Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If any type under `status.conditions` section reports that the Application is not ready, check the pod's log.
+Compared to the last status, `ResourcesReady` type now shows the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If any type under `status.conditions` section reports that the Application is not ready, check the pod's log.
 
-11. To see the changes in effect, check the managed resources in `Topology` section, you will now see a new resource under `HorizontalPodAutoscalers` section.
+10. To see the changes in effect, check the managed resources on `Topology` page, you will now see a new resource under `HorizontalPodAutoscalers` section.
 +
 image:images/topology-new.png[,900]
-+
-Click on the HPA resource and scroll down to the status condition to see if scaling is working as expected. You may have to wait for the HPA resource to receive metrics from the application pod.
+
+11. Click on the HPA resource and scroll down to the status condition to see if scaling is working as expected. You may have to wait up to several minutes for the HPA resource to receive metrics from the application pod.
 +
 image:images/hpa-status-conditions.png[,900]
 +
-You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count. These report that the workload is being scaled with desired resource utilization.
+You should see `AbleToScale` and `ScalingActive` type reporting `True`. These report that the workload is being scaled with desired resource utilization. Depending on the resource consumption at the moment, `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count.
 
-12. Edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
+12. Edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, remove all fields under `autoscaling`:
 +
 [source,yaml]
 ----
-spec:
-...
   autoscaling:
-
 ----
 
 13. Check the status of the OpenLibertyApplication instance again at the bottom.
 +
-image:images/status-no-hpa.png[,700]
+image:images/status.png[,700]
 +
-As in the example, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
+As in the example, `message` field shows the static number of running replicas out of configured number of replicas again with HPA disabled.
 
 14. Please delete the OpenLibertyApplication instance to clean up the resources.
 +
