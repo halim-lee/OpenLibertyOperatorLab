@@ -242,6 +242,13 @@ You can see that the Liberty application is successfully connected to JIT Server
   semeruCloudCompiler:
     enable: true
     replicas: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
 ----
 +
 To apply the changes, run:
@@ -513,6 +520,13 @@ spec:
   semeruCloudCompiler:
     enable: true
     replicas: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
 ----
 
 10. Go back to `Topology` page to see managed resources of OpenLibertyApplication instance.
