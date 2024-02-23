@@ -433,7 +433,7 @@ It shows Knative service's Pod, Revision and Route created by the operator. Two 
 +
 Knative service autoscales the workload and when the workload is idle, so it may scale the pod to zero. Then the pod will be removed in the list. When traffic is observed (i.e. route is accessed), the pod will be scaled back up.
 
-6. You will see that there is only 1 revision available under `Revisions` section`. This captures point-in-time snapshot of the Knative service. The actual and desired replicas in the output may be 0's because of Knative service's scale-to-zero feature when the pod is idle.
+6. You will see that there is only 1 revision available under `Revisions` section. This captures point-in-time snapshot of the Knative service. The actual and desired replicas in the output may be 0's because of Knative service's scale-to-zero feature when the pod is idle.
 +
 image:images/revisions.png[,900]
 
@@ -476,7 +476,7 @@ image:images/traffic-distribution.png[,500]
 
 12. Access the sample app on browser again and try refreshing the page several times. It will change the Open Liberty version from time to time. 50% of the traffic is assigned to the first revision (23.0.0.3) and the other to the second revision (23.0.0.8). This feature helps dividing traffic between different revisions as wanted.
 +
-There is now a running replica under each revision, compared to when there was only 1 running replica for revision 2. You can also see `50%` on the right side of each revision.
+There is now a running replica under each revision, compared to when there was only 1 running replica for revision 2. You can also see 50% on the right side of each revision.
 +
 image:images/topology-new.png[,900]
 
