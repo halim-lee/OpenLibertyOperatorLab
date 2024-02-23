@@ -125,6 +125,13 @@ As in the example output, `ResourcesReady` 's message field shows the number of 
 +
 [source,sh]
 ----
+oc logs deployment/certificate-liberty-app -n $NAMESPACE
+----
++
+For Mac/Linux users, to grab the log directly:
++
+[source,sh]
+----
 oc logs deployment/certificate-liberty-app -n $NAMESPACE | grep CWWKF0011I
 ----
 +
@@ -178,10 +185,10 @@ Verify that a TLS secret is also created with the issuer. Below command will gra
 +
 [source,sh]
 ----
-oc get secrets --field-selector type=kubernetes.io/tls -n $NAMESPACE | grep certificate-liberty-app
+oc get secrets --field-selector type=kubernetes.io/tls -n $NAMESPACE
 ----
 +
-The output should look like the following:
+The output should include the following secrets:
 +
 [source,log]
 ----
@@ -235,10 +242,10 @@ This configuration adds annotation to use Red Hat OpenShift CA. It will ensure `
 +
 [source,sh]
 ----
-oc get secrets --field-selector type=kubernetes.io/tls -n $NAMESPACE | grep certificate-liberty-app
+oc get secrets --field-selector type=kubernetes.io/tls -n $NAMESPACE
 ----
 +
-The output should look like the following:
+The output should include the following secrets:
 +
 [source,log]
 ----
