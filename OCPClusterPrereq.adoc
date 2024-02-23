@@ -1,6 +1,6 @@
-= Prerequisites Guide
+= Red Hat OpenShift Container Platform Setup Guide
 
-This guide is for the users who are not using the educational cluster.
+This guide is for the users who are using their own cluster.
 
 == Cluster Requirement
 Red Hat OpenShift Container Platform 4.12 or newer
