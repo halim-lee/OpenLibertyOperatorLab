@@ -78,7 +78,7 @@ oc project $NAMESPACE
 ** Download and install the binary through the link:++https://jqlang.github.io/jq/download/++[link].
 
 == Using your own Red Hat OpenShift Container Platform
-Set up your own cluster to meet the cluster requirements following link:++../OCPClusterPrereq.adoc++[Cluster Prerequisite guide]
+Set up your own cluster to meet the cluster requirements following link:++OCPClusterPrereq.adoc++[Cluster Prerequisite guide]
 
 == Kubernetes Basics
 If you are new to containers and Kubernetes, see below to learn the basics.
