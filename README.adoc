@@ -4,12 +4,10 @@ Welcome to the Open Liberty Operator Labs. This series of labs is designed to he
 
 During the lab sessions, you will have the opportunity to explore the following features:
 
-* link:++1-AutoscalingLab++[Horizontal Pod Autoscaling with CPU and Memory resource constraints]
-* link:++2-KnativeLab++[Knative services]
-* link:++3-CertManagerLab++[Certificate management and TLS]
-* link:++4-SemeruLab++[Semeru Cloud Compiler (JIT Server integration)]
-
-Please follow the order from top to bottom.
+* link:++1-AutoscalingLab++[1. Horizontal Pod Autoscaling with CPU and Memory resource constraints]
+* link:++2-KnativeLab++[2. Knative services]
+* link:++3-CertManagerLab++[3. Certificate management and TLS]
+* link:++4-SemeruLab++[4. Semeru Cloud Compiler (JIT Server integration)]
 
 == Open Liberty Operator
 If you are interested in gaining in-depth knowledge about Open Liberty Operator, refer to the link:++https://github.com/OpenLiberty/open-liberty-operator/blob/main/doc/user-guide-v1.adoc++[documentation].
@@ -23,16 +21,49 @@ Before starting the lab, please ensure you meet the following requirements:
 *** M1/M2 Mac: openshift-client-mac-arm64.tar.gz
 *** Windows: openshift-client-windows.zip
 *** Linux: openshift-client-linux.tar.gz
-** Unzip the file. Copy the executable file to bin folder or export the path:
+** Unzip the file. Add the directory where `oc` is extracted to your _PATH_:
 *** Mac/Linux:
 +
 [source,sh]
 ----
-sudo mv oc /usr/local/bin/
+export PATH=$OC_HOME:$PATH
 ----
-*** Windows:
 +
-Copy the `oc` file to your binary directory.
+**** For example:
++
+[source,sh]
+----
+export PATH=${HOME}/Downloads/openshift-client-mac/:$PATH
+----
++
+
+*** Windows Command Prompt:
++
+[source,sh]
+----
+set PATH=$OC_HOME;%PATH%
+----
++
+**** For example:
++
+[source,sh]
+----
+set PATH=%HOMEPATH%\Downloads\openshift-client-windows\;%PATH%
+----
+
+*** Windows Cygwin Terminal:
++
+[source,sh]
+----
+export PATH=$OC_HOME:$PATH
+----
++
+**** For example:
++
+[source,sh]
+----
+export PATH=${HOMEPATH}/Downloads/openshift-client-windows/:$PATH
+----
 
 2. Access to an OpenShift cluster with Open Liberty Operator already installed.
 +
