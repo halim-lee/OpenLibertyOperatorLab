@@ -23,8 +23,8 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 [%collapsible]
 ====
 
-.*Environment setup: Logging into the cluster and setting namespace*
-[%collapsible]
+._Environment setup: If already setup, you can close this section_
+[%collapsible%open]
 =====
 1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
 
@@ -54,6 +54,8 @@ export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
 =====
+
+_Start here after Environment Setup_
 
 1. Create a YAML file called `liberty-certificate.yaml` with the following content:
 +
