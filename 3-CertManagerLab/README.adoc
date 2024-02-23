@@ -416,7 +416,7 @@ image:images/ol-edit.png[,500]
 
 7. Scroll to the botton of the YAML file. As in the example, `ResourcesReady` 's message field shows the number of running replicas out of configured number of replicas. `svcCertSecretName` field shows the generated certificate secret name that the application uses.
 +
-image:images/status-conditions.png[,900]
+image:images/status-conditions-tls.png[,900]
 +
 If any type under status conditions section reports that the Application is not ready even after a considerate amount of time, check the application's log through Topology page.
 
