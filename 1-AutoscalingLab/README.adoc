@@ -20,6 +20,10 @@ Choose one of two methods to deploy OpenLibertyApplication instance on your clus
 .*Method A: Deployment through `oc` client*
 [%collapsible]
 ====
+
+._Environment setup: If already setup, you can close this section_
+[%collapsible%open]
+=====
 1. Make sure you have `oc` client and `jq` installed in your system. `oc` client is used to communicate with RedHat OpenShift cluster and `jq` is a JSON processing tool, which helps formatting and extracting data.
 
 2. Log into a RedHat OpenShift cluster.
@@ -47,8 +51,11 @@ NOTE: _Replace `<your-namespace>` with the namespace provided to you for the lab
 export NAMESPACE=<your-namespace>
 oc project $NAMESPACE
 ----
+=====
 
-4. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
+_Start here after Environment Setup_
+
+1. Create a YAML file called `liberty-autoscaling.yaml` with the following content:
 +
 [source,yaml]
 ----
@@ -69,7 +76,7 @@ spec:
       memory: 256Mi
 ----
 
-5. Create the OpenLibertyApplication instance using the command:
+2. Create the OpenLibertyApplication instance using the command:
 +
 [source,sh]
 ----
@@ -77,7 +84,7 @@ oc apply -f liberty-autoscaling.yaml
 ----
 This will create a Deployment named `autoscaling-liberty-app` with 1 replica. The resources field defines a metric source for targeted container resources.
 
-6. Check the status of the OpenLibertyApplication instance by running:
+3. Check the status of the OpenLibertyApplication instance by running:
 +
 [source,sh]
 ----
@@ -112,13 +119,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 +
 As in the example output, `message` field shows the number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready, check the pod's log, by running `oc logs <pod_name>`. You can get the pod name through `oc get pods -n $NAMESPACE`.
 
-7. Edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Run the command: 
-+
-[source,sh]
-----
-oc edit OpenLibertyApplication autoscaling-liberty-app
-----
-Then remove `replicas: 1` under `spec` field and replace it with the following:
+4. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Remove `replicas: 1` under `spec` field and replace it with `autoscaling` field:
 +
 [source,yaml]
 ----
@@ -129,9 +130,16 @@ spec:
     targetCPUUtilizationPercentage: 50
 ----
 +
+Apply the changes using the command:
++
+[source,sh]
+----
+oc apply -f liberty-autoscaling.yaml
+----
++
 In this example, it  `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-8. Check the status of the OpenLibertyApplication instance again by running:
+5. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
@@ -165,7 +173,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 +
 Compared to the last status output, `ResourcesReady` type now outputs the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready, check the pod's log.
 
-9. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
+6. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
 [source,sh]
 ----
@@ -192,7 +200,7 @@ NAME                                                          REFERENCE         
 horizontalpodautoscaler.autoscaling/autoscaling-liberty-app   Deployment/autoscaling-liberty-app   <unknown>/50%   2         3         2          67s
 ----
 
-10. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait up to several minutes for the HPA resource to receive metrics from the application pod.
+7. Check the status of HorizontalPodAutoscaler resource to see if scaling is working as expected. You may have to wait up to several minutes for the HPA resource to receive metrics from the application pod.
 +
 [source,sh]
 ----
@@ -230,14 +238,7 @@ It will print output similar to the following:
 +
 You should see `AbleToScale` and `ScalingActive` type reporting `True`. `ScalingLimited` type may report `True` saying that the desired replica count is less than the minimum or more than the maximum replica count. These report that the workload is being scaled with desired resource utilization.
 
-11. Edit the OpenLibertyApplication instance to disable autoscaling feature by setting `.spec.autoscaling` field empty. Run the command:
-+
-[source,sh]
-----
-oc edit OpenLibertyApplication autoscaling-liberty-app
-----
-+
-Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
+8. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to disable autoscaling feature. Under `spec` field, set `autoscaling:` and remove all fields under `autoscaling`:
 +
 [source,yaml]
 ----
@@ -246,8 +247,15 @@ spec:
   autoscaling:
 
 ----
++
+Apply the changes using the command:
++
+[source,sh]
+----
+oc apply -f liberty-autoscaling.yaml
+----
 
-12. Check the status of the OpenLibertyApplication instance again by running:
+9. Check the status of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
@@ -280,7 +288,7 @@ oc get OpenLibertyApplication autoscaling-liberty-app -ojson | jq '.status.condi
 +
 As in the example output, `message` field shows the number of running replicas out of configured number of replicas again with HPA disabled.
 
-13. Please delete the OpenLibertyApplication instance to clean up the resources.
+10. Please delete the OpenLibertyApplication instance to clean up the resources.
 +
 [source,sh]
 ----
