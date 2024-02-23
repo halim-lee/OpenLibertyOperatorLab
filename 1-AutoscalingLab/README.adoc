@@ -117,7 +117,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ]
 ----
 +
-As in the example output, `ResourcesReady` 's message field shows the static number of running replicas out of configured number of replicas. If the `status` reports that the Application is not ready even after a considerate amount of time, check the application's log, by running `oc logs deployment/autoscaling-liberty-app`.
+As in the example output, `ResourcesReady` 's message field shows the static number of running replicas out of configured number of replicas. If any type under status conditions section reports that the Application is not ready even after a considerate amount of time, check the application's log, by running `oc logs deployment/autoscaling-liberty-app`.
 
 4. Open `liberty-autoscaling.yaml` file and edit the OpenLibertyApplication instance to use `autoscaling` field as opposed to `replicas` field. Under `spec` field, remove `replicas: 1` and replace it with `autoscaling` field:
 +
@@ -138,7 +138,7 @@ oc apply -f liberty-autoscaling.yaml
 +
 In this example, `autoscaling` field configures the range of number of Pods for a workload using `maxReplicas` and `minReplicas`. These fields ensure that the number of Pods falls within the specified range. Replica scaling will be determined using `targetCPUUtilizationPercentage` and the metric specified under `resources` field.
 
-5. Check the status of the OpenLibertyApplication instance again by running:
+5. Check the status conditions of the OpenLibertyApplication instance again by running:
 +
 [source,sh]
 ----
@@ -170,7 +170,7 @@ It should print output that the application is `Reconciled`, `Ready` and `Resour
 ]
 ----
 +
-Compared to the last status conditions output, `ResourcesReady` 's message field now outputs the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the `status` reports that the Application is not ready for long, check the log.
+Compared to the last status conditions output, `ResourcesReady` 's message field now outputs the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If the status conditions section reports that the Application is not ready for long, check the log.
 
 6. When you check the managed resources, you will see that HorizontalPodAutoscaler resource has been created.
 +
@@ -349,7 +349,7 @@ image:images/ola.png[,500]
 +
 image:images/status.png[,700]
 +
-If the `status` reports that the Application is not ready even after a considerate amount of time, check the application's log through Topology page.
+If any type under status conditions section reports that the Application is not ready even after a considerate amount of time, check the application's log through Topology page.
 +
 image:images/pod-log.png[,700]
 
@@ -370,7 +370,7 @@ In this example, `autoscaling` field configures the range of number of Pods for 
 +
 image:images/status-new.png[,700]
 +
-Compared to the last status conditions, `ResourcesReady` 's message now shows the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If any type under `status.conditions` section reports that the Application is not ready, check the pod's log.
+Compared to the last status conditions, `ResourcesReady` 's message now shows the number of running replicas only without the desired number of replicas. It will report `ResourcesReady` is true when the currently running number of pods is within the range of `maxReplicas` and `minReplicas`. If status conditions section reports that the Application is not ready for long, check the pod's log.
 
 10. To see the changes in effect, check the managed resources on `Topology` page, you will now see a new resource under `HorizontalPodAutoscalers` section.
 +
