@@ -14,7 +14,7 @@ There are three methods to generate and configure certificates with Open Liberty
 
 == Getting Started
 * Using educational cluster? If you need access to the cluster, please contact Lab Administrators to have credentials assigned to you.
-* Using your own cluster? Please follow link:++../OCPClusterPrereq.adoc++[Cluster Prerequisite guide] before proceeding.
+* Using your own cluster? Please follow link:++../OCPClusterSetup.adoc++[Cluster Setup guide] before proceeding.
 
 == Deployment Options
 Choose one of two methods to deploy OpenLibertyApplication instance on your cluster.
